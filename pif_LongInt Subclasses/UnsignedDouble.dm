@@ -241,7 +241,7 @@ pif_LongInt/UnsignedDouble
 					throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
 
 				else
-					// One again, it's a list so we allocate differently depending on
+					// Once again, it's a list so we allocate differently depending on
 					// its size.
 
 					switch(arguments.len)

@@ -1,5 +1,5 @@
 /**
- ** pif_QuickSig
+ ** pif_LongInt
  **   Version: b1.1.201604##
  **   Release Date: April ##, 2016
  **
@@ -10,15 +10,15 @@ pif_LongInt is a library that implements both signed and unsigned double, triple
 precision (32-bit, 48-bit, and 64-bit) integers. In this beta version, only the 32-bit unsigned
 double precision integer is available.
 
- +---------------------------------------------------+
- |                                                   |
- |  Contents                                         |
- |  1. License                                       |
- |  2. GitHub Repository                             |
- |  3. Release Notes                                 |
- |  4. To Do/Plans                                   |
- |                                                   |
- +---------------------------------------------------+
+ +------------------------+
+ |                        |
+ |  Contents              |
+ |  1. License            |
+ |  2. GitHub Repository  |
+ |  3. Release Notes      |
+ |  4. To Do/Plans        |
+ |                        |
+ +------------------------+
 
   1. License
   ----------------------------------------------------
@@ -58,7 +58,7 @@ double precision integer is available.
 
   - Write up complete documentation for the library.
   - Fully-implemented the SignedDouble class.
-  - Implement classe for both signed and unsigned triple and quadruple-precision integers.
+  - Implement classes for both signed and unsigned triple and quadruple-precision integers.
 
 ****************************************************************************************************
 ****************************************************************************************************/
