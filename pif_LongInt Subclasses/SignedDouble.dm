@@ -27,7 +27,7 @@ pif_LongInt/SignedDouble
 			return src.Increment()
 
 	IsPositive()
-		return !IsNonNegative() && !IsZero()
+		return !IsNegative() && !IsZero()
 	IsZero()
 		return (block_1 == 0) && (block_2 == 0)
 	IsNegative()
@@ -72,3 +72,10 @@ pif_LongInt/SignedDouble
 
 		if(negative)
 			. = "-[.]"
+
+	Maximum()
+		// 2147483647
+		return new /pif_LongInt/SignedDouble(0x7FFF, 0xFFFF)
+	Minimum()
+		// -2147483648
+		return new /pif_LongInt/SignedDouble(0x8000, 0x0000)
