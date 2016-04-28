@@ -37,8 +37,9 @@
   Version b1.1.201604##.
 
     - Added Release Notes and To Do sections to pif_Arithmetic.
-    - Added FirstFirstSet() method.
+    - Added FirstFirstSet() and FindLastSet() methods.
     - Changed Highest() and Lowest() to Maximum() and Minumum(), respectively.
+    - Clarified the behavior of the PrintBinary(), PrintDecimal(), and PrintHexadecimal() methods.
 
   Version b1.0.20160409.
 
@@ -830,9 +831,30 @@ If the format provided for a GAAF-specified method does not match one of the abo
 
 			  Behavior.
 
-			    Outputs the position of least-significant non-zero bit. That is, the position of
+			    Outputs the position of least-significant non-zero bit. That is, the position of the
                 first bit from the right which is not equal to zero. The least-significant bit is
                 considered in position zero.
+
+			  Returns.
+
+			    A non-negative integer.
+
+			*/
+
+		FindLastSet()
+			/*
+
+			Outputs the position of the most-significant non-zero bit.
+
+			  Arguments.
+
+			    None.
+
+			  Behavior.
+
+			    Outputs the position of the most-significant non-zero bit. Taht is, the position of
+			    the first bit from the left which is not equal to zero. The least-significant bit is
+			    considered to be in position zero.
 
 			  Returns.
 
@@ -1281,7 +1303,9 @@ If the format provided for a GAAF-specified method does not match one of the abo
 		PrintBinary()
 			/*
 
-			Outputs a binary-encoded string equal to the value of the source object.
+			Outputs a binary-encoded string equal to the value of the source object. It should
+			be essentially a plain read-out of the stored binary data, and include nothing about
+			signs.
 
 			  Arguments.
 
@@ -1296,7 +1320,9 @@ If the format provided for a GAAF-specified method does not match one of the abo
 		PrintDecimal()
 			/*
 
-			Outputs a decimal-encoded string equal to the value of the source object.
+			Outputs a decimal-encoded string equal to the value of the source object. This should
+			be in standard decimal notation, and include signs if necessary (e.g., for negative
+			numbers).
 
 			  Arguments.
 
@@ -1311,7 +1337,9 @@ If the format provided for a GAAF-specified method does not match one of the abo
 		PrintHexadecimal()
 			/*
 
-			Outputs a hexadecimal-encoded string equal to the value of the source object.
+			Outputs a hexadecimal-encoded string equal to the value of the source object. It should
+			be essentially a plain read-out of the stored hexadecimal data, and include nothing about
+			signs.
 
 			  Arguments.
 
