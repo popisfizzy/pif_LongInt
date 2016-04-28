@@ -1,6 +1,7 @@
 /*
  * Implementation of an unsigned double precision (32-bit) integer that uses the
- * pif_Arithmetic protocol (inherited from the /pif_LongInt superclass).
+ * pif_Arithmetic protocol (inherited from the /pif_LongInt superclass). It can
+ * accurately store numbers between 0 and 4294967295 (between 0x0000 and 0xFFFF).
  */
 
 pif_LongInt/UnsignedDouble
@@ -293,35 +294,6 @@ pif_LongInt/UnsignedDouble
 	 * Arithmetic methods.
 	 */
 
-// These macros are here to make the behavior of the following clode clearer, because
-// otherwise it's confusing on two counts: one is that bit manipulation is often difficult
-// to follow to begin with, while the other is that two conceptually distinct operations
-// (e.g., getting the second byte from some variable and getting the buffer from some
-// variable) have the same bitwise arithmetic operations.
-
-#define	FLOOR(X)			round(X)				// The largest integer less than X.
-
-#define	BYTE_ONE(X)			((X) & 0x00FF)			// Extracts the first byte of X.
-#define	BYTE_TWO(X)			(((X) & 0xFF00) >> 8)	// Extracs the second byte.
-
-#define	BYTE_ONE_N(X)		(~(X) & 0x00FF)			// Extracts the bitwise-not of the first byte.
-#define	BYTE_TWO_N(X)		((~(X) & 0xFF00) >> 8)	// Bitwise not of the second byte.
-
-#define	BYTE_ONE_SHIFTED(X)	(((X) & 0x00FF) << 8)	// Shifts byte one of X into byte two.
-
-#define	DATA(X)				BYTE_ONE(X)				// Gets the data from X.
-#define	BUFFER(X)			BYTE_TWO(X)				// Gets the buffer from X.
-#define	ADDBUFFER(X,Y)		(Y) += BUFFER(X)		// Adds the buffer of X to Y.
-#define	ADDDATA(X,Y)		(Y) += DATA(X)			// Adds the data of X to Y.
-
-#define	DATA_T2(X)			(DATA(X) << 1)			// Gets the data from X and multiplies it by 2.
-#define	BUFFER_T2(X)		(((X) & 0xFF00) >> 7)	// Gets the buffer of X and multiplies it b 2.
-#define	ADDDATA_T2(X,Y)		(Y) += DATA_T2(X)		// Add the data (times 2) from X to Y.
-#define	ADDBUFFER_T2(X,Y)	(Y) += BUFFER_T2(X)		// Add the buffer (times 2) of X to Y.
-
-#define	FLUSH(X) 			(X) &= 0x00FF			// Flush the buffer of X. That is, clear out the
-													// data in the buffer.
-
 	Add(...)
 
 		/*
@@ -354,19 +326,19 @@ pif_LongInt/UnsignedDouble
 
 		// Compute the first block.
 
-		B1 = BYTE_ONE(block_1) + BYTE_ONE(Int_block_1)
-		B2 = BYTE_TWO(block_1) + BYTE_TWO(Int_block_1) + BUFFER(B1)
+		B1 = pliBYTE_ONE(block_1) + pliBYTE_ONE(Int_block_1)
+		B2 = pliBYTE_TWO(block_1) + pliBYTE_TWO(Int_block_1) + pliBUFFER(B1)
 
-		Sum._SetBlock(1, BYTE_ONE(B1) | BYTE_ONE_SHIFTED(B2))
+		Sum._SetBlock(1, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
 		// And the second block.
 
-		B1 = BYTE_ONE(block_2) + BYTE_ONE(Int_block_2) + BUFFER(B2)
-		B2 = BYTE_TWO(block_2) + BYTE_TWO(Int_block_2) + BUFFER(B1)
+		B1 = pliBYTE_ONE(block_2) + pliBYTE_ONE(Int_block_2) + pliBUFFER(B2)
+		B2 = pliBYTE_TWO(block_2) + pliBYTE_TWO(Int_block_2) + pliBUFFER(B1)
 
-		Sum._SetBlock(2, BYTE_ONE(B1) | BYTE_ONE_SHIFTED(B2))
+		Sum._SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
-		if( (BUFFER(B2) != 0) && (mode & OVERFLOW_EXCEPTION) )
+		if( (pliBUFFER(B2) != 0) && (mode & OVERFLOW_EXCEPTION) )
 			// If B2's buffer is not equal to zero, then we overflowed and need
 			// to throw the OverflowException if it's flag set.
 
@@ -410,19 +382,19 @@ pif_LongInt/UnsignedDouble
 		// of Int_block_1. In two's complement notation, this is equivalent
 		// to negating it.
 
-		B1 = BYTE_ONE(block_1) + BYTE_ONE_N(Int_block_1) + 1 // Adding one for negation.
-		B2 = BYTE_TWO(block_1) + BYTE_TWO_N(Int_block_1) + BUFFER(B1)
+		B1 = pliBYTE_ONE(block_1) + pliBYTE_ONE_N(Int_block_1) + 1 // Adding one for negation.
+		B2 = pliBYTE_TWO(block_1) + pliBYTE_TWO_N(Int_block_1) + pliBUFFER(B1)
 
-		Diff._SetBlock(1, BYTE_ONE(B1) | BYTE_ONE_SHIFTED(B2))
+		Diff._SetBlock(1, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
 		// And now the second block.
 
-		B1 = BYTE_ONE(block_2) + BYTE_ONE_N(Int_block_2) + BUFFER(B2)
-		B2 = BYTE_TWO(block_2) + BYTE_TWO_N(Int_block_2) + BUFFER(B1)
+		B1 = pliBYTE_ONE(block_2) + pliBYTE_ONE_N(Int_block_2) + pliBUFFER(B2)
+		B2 = pliBYTE_TWO(block_2) + pliBYTE_TWO_N(Int_block_2) + pliBUFFER(B1)
 
-		Diff._SetBlock(2, BYTE_ONE(B1) | BYTE_ONE_SHIFTED(B2))
+		Diff._SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
-		if( (BUFFER(B2) == 0) && (mode & OVERFLOW_EXCEPTION) )
+		if( (pliBUFFER(B2) == 0) && (mode & OVERFLOW_EXCEPTION) )
 			// If B2's buffer is equal to zero, then there was a negative
 			// overflow. Thus, we need to possibly throw the OverflowException.
 
@@ -474,15 +446,15 @@ pif_LongInt/UnsignedDouble
 		var
 			// These are the bytes of both src and Int.
 
-			src0 = BYTE_ONE(block_1)		// Least significant.
-			src1 = BYTE_TWO(block_1)
-			src2 = BYTE_ONE(block_2)
-			src3 = BYTE_TWO(block_2)		// Most significant.
+			src0 = pliBYTE_ONE(block_1)		// Least significant.
+			src1 = pliBYTE_TWO(block_1)
+			src2 = pliBYTE_ONE(block_2)
+			src3 = pliBYTE_TWO(block_2)		// Most significant.
 
-			Int0 = BYTE_ONE(Int_block_1)	// Least significant.
-			Int1 = BYTE_TWO(Int_block_1)
-			Int2 = BYTE_ONE(Int_block_2)
-			Int3 = BYTE_TWO(Int_block_2)	// Most significant.
+			Int0 = pliBYTE_ONE(Int_block_1)	// Least significant.
+			Int1 = pliBYTE_TWO(Int_block_1)
+			Int2 = pliBYTE_ONE(Int_block_2)
+			Int3 = pliBYTE_TWO(Int_block_2)	// Most significant.
 
 			// Bytes of the final result. We will only use the first byte of each, while
 			// the second byte will be used as a buffer to temporarily store bits until we
@@ -513,8 +485,8 @@ pif_LongInt/UnsignedDouble
 
 		prod_1 = src0*Int0
 
-		ADDBUFFER(prod_1, prod_2)
-		FLUSH(prod_1)
+		pliADDBUFFER(prod_1, prod_2)
+		pliFLUSH(prod_1)
 
 		/*
 
@@ -528,19 +500,19 @@ pif_LongInt/UnsignedDouble
 
 		buffer  = src1*Int0
 
-		ADDDATA(buffer, prod_2)
-		prod_3 = BUFFER(buffer) + BUFFER(prod_2)
-		FLUSH(prod_2)
+		pliADDDATA(buffer, prod_2)
+		prod_3 = pliBUFFER(buffer) + pliBUFFER(prod_2)
+		pliFLUSH(prod_2)
 
 		buffer  = src0*Int1
 
-		ADDDATA(buffer, prod_2)
-		prod_3 += BUFFER(buffer) + BUFFER(prod_2)
-		ADDBUFFER(prod_3, prod_4) // Still zero up to this point, and BUFFER is at most 255, so we don't need
+		pliADDDATA(buffer, prod_2)
+		prod_3 += pliBUFFER(buffer) + pliBUFFER(prod_2)
+		pliADDBUFFER(prod_3, prod_4) // Still zero up to this point, and pliBUFFER is at most 255, so we don't need
 								  // to worry about flushing it.
 
-		FLUSH(prod_2)
-		FLUSH(prod_3)
+		pliFLUSH(prod_2)
+		pliFLUSH(prod_3)
 
 		/*
 
@@ -557,54 +529,54 @@ pif_LongInt/UnsignedDouble
 
 			buffer  = src2*Int0
 
-			ADDDATA(buffer, prod_3)
-			prod_4 += BUFFER(buffer) + BUFFER(prod_3)
-			FLUSH(prod_3)
-			FLUSH(prod_4)
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
 
 			buffer  = src1*Int1
 
-			ADDDATA(buffer, prod_3)
-			prod_4 += BUFFER(buffer) + BUFFER(prod_3)
-			FLUSH(prod_3)
-			FLUSH(prod_4)
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
 
 			buffer  = src0*Int2
 
-			ADDDATA(buffer, prod_3)
-			prod_4 += BUFFER(buffer) + BUFFER(prod_3)
-			FLUSH(prod_3)
-			FLUSH(prod_4)
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
 
 		else
 			// Check for it.
 
 			buffer  = src2*Int0
 
-			ADDDATA(buffer, prod_3)
-			prod_4 += BUFFER(buffer) + BUFFER(prod_3)
-			if(!overflow_flag && (BUFFER(prod_4) != 0))
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
 				overflow_flag = 1
-			FLUSH(prod_3)
-			FLUSH(prod_4)
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
 
 			buffer  = src1*Int1
 
-			ADDDATA(buffer, prod_3)
-			prod_4 += BUFFER(buffer) + BUFFER(prod_3)
-			if(!overflow_flag && (BUFFER(prod_4) != 0))
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
 				overflow_flag = 1
-			FLUSH(prod_3)
-			FLUSH(prod_4)
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
 
 			buffer  = src0*Int2
 
-			ADDDATA(buffer, prod_3)
-			prod_4 += BUFFER(buffer) + BUFFER(prod_3)
-			if(!overflow_flag && (BUFFER(prod_4) != 0))
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
 				overflow_flag = 1
-			FLUSH(prod_3)
-			FLUSH(prod_4)
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
 
 		/*
 
@@ -620,29 +592,29 @@ pif_LongInt/UnsignedDouble
 			// If we arent' checking for overflow, then we can directly add the data to prod_4
 			// and flush at the end.
 
-			prod_4 += DATA(src3*Int0)
-			prod_4 += DATA(src2*Int1)
-			prod_4 += DATA(src1*Int2)
-			prod_4 += DATA(src0*Int3)
+			prod_4 += pliDATA(src3*Int0)
+			prod_4 += pliDATA(src2*Int1)
+			prod_4 += pliDATA(src1*Int2)
+			prod_4 += pliDATA(src0*Int3)
 
-			FLUSH(prod_4)
+			pliFLUSH(prod_4)
 
 		else
 
 			prod_4 += src3*Int0
-			if(!overflow_flag && (BUFFER(prod_4) != 0))
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
 				overflow_flag = 1
 
 			prod_4 += src2*Int1
-			if(!overflow_flag && (BUFFER(prod_4) != 0))
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
 				overflow_flag = 1
 
 			prod_4 += src1*Int2
-			if(!overflow_flag && (BUFFER(prod_4) != 0))
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
 				overflow_flag = 1
 
 			prod_4 += src0*Int3
-			if(!overflow_flag && (BUFFER(prod_4) != 0))
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
 				overflow_flag = 1
 
 		// Now we check the last few situations that could have caused an overflow.
@@ -662,8 +634,8 @@ pif_LongInt/UnsignedDouble
 		 * result.
 		 */
 
-		Prod._SetBlock(1, prod_1 | BYTE_ONE_SHIFTED(prod_2) )
-		Prod._SetBlock(2, prod_3 | BYTE_ONE_SHIFTED(prod_4) )
+		Prod._SetBlock(1, prod_1 | pliBYTE_ONE_SHIFTED(prod_2) )
+		Prod._SetBlock(2, prod_3 | pliBYTE_ONE_SHIFTED(prod_4) )
 
 		if(overflow_flag && (mode & OVERFLOW_EXCEPTION))
 			// If overflow occured and we need to report it, then throw the OverflowException.
@@ -687,16 +659,16 @@ pif_LongInt/UnsignedDouble
 
 			// Bytes of the src object.
 			src0 = 0 // Used once we "normalize" the data.
-			src1 = BYTE_TWO(block_2)
-			src2 = BYTE_ONE(block_2)
-			src3 = BYTE_TWO(block_1)
-			src4 = BYTE_ONE(block_1)
+			src1 = pliBYTE_TWO(block_2)
+			src2 = pliBYTE_ONE(block_2)
+			src3 = pliBYTE_TWO(block_1)
+			src4 = pliBYTE_ONE(block_1)
 
 			// Bytes of the Int data.
-			Int1 = BYTE_TWO(Int_block_2)
-			Int2 = BYTE_ONE(Int_block_2)
-			Int3 = BYTE_TWO(Int_block_1)
-			Int4 = BYTE_ONE(Int_block_1)
+			Int1 = pliBYTE_TWO(Int_block_2)
+			Int2 = pliBYTE_ONE(Int_block_2)
+			Int3 = pliBYTE_TWO(Int_block_1)
+			Int4 = pliBYTE_ONE(Int_block_1)
 
 			// Bytes of the result.
 			q0 = 0
@@ -812,33 +784,33 @@ pif_LongInt/UnsignedDouble
 		// Step D1 [Normalize].
 
 		// Now we compute the normalization factor. This term is used to make sure that
-		// Int1 >= Floor(base / 2).
-		adj = FLOOR(base / (Int1 + 1))
+		// Int1 >= pliFLOOR(base / 2).
+		adj = pliFLOOR(base / (Int1 + 1))
 
 		// We multiply both Int and src by adj. Int will always remain the same number
 		// of bytes, but src may gain one extra. This is why src0 is defined.
 
 		Int4 *=  adj
-		Int3  = (adj*Int3) + BUFFER(Int4)
-		Int2  = (adj*Int2) + BUFFER(Int3)
-		Int1  = (adj*Int1) + BUFFER(Int2)
+		Int3  = (adj*Int3) + pliBUFFER(Int4)
+		Int2  = (adj*Int2) + pliBUFFER(Int3)
+		Int1  = (adj*Int1) + pliBUFFER(Int2)
 
-		FLUSH(Int1)
-		FLUSH(Int2)
-		FLUSH(Int3)
-		FLUSH(Int4)
+		pliFLUSH(Int1)
+		pliFLUSH(Int2)
+		pliFLUSH(Int3)
+		pliFLUSH(Int4)
 
 		src4 *=  adj
-		src3  = (adj*src3) + BUFFER(src4)
-		src2  = (adj*src2) + BUFFER(src3)
-		src1  = (adj*src1) + BUFFER(src2)
-		src0  = BUFFER(src1) // Since src0 = 0 from the get go, (adj*src0) = 0.
+		src3  = (adj*src3) + pliBUFFER(src4)
+		src2  = (adj*src2) + pliBUFFER(src3)
+		src1  = (adj*src1) + pliBUFFER(src2)
+		src0  = pliBUFFER(src1) // Since src0 = 0 from the get go, (adj*src0) = 0.
 
-		FLUSH(src0)
-		FLUSH(src1)
-		FLUSH(src2)
-		FLUSH(src3)
-		FLUSH(src4)
+		pliFLUSH(src0)
+		pliFLUSH(src1)
+		pliFLUSH(src2)
+		pliFLUSH(src3)
+		pliFLUSH(src4)
 
 		/*
 		 * Computation.
@@ -868,7 +840,7 @@ pif_LongInt/UnsignedDouble
 		// Step D3 [Calculate q-hat.]
 
 		if(src0 == Int1)	qhat = base - 1
-		else				qhat = FLOOR( (src0*base + src1) / Int1 )
+		else				qhat = pliFLOOR( (src0*base + src1) / Int1 )
 
 		while( (Int2*qhat) > ((src0*base + src1 - Int1*qhat)*base + src2) )
 			qhat --
@@ -880,16 +852,16 @@ pif_LongInt/UnsignedDouble
 			// we proceed..
 
 			i4 = qhat*Int4
-			i3 = qhat*Int3 + BUFFER(i4)
-			i2 = qhat*Int2 + BUFFER(i3)
-			i1 = qhat*Int1 + BUFFER(i2)
-			i0 = BUFFER(i1)
+			i3 = qhat*Int3 + pliBUFFER(i4)
+			i2 = qhat*Int2 + pliBUFFER(i3)
+			i1 = qhat*Int1 + pliBUFFER(i2)
+			i0 = pliBUFFER(i1)
 
-			FLUSH(i0)
-			FLUSH(i1)
-			FLUSH(i2)
-			FLUSH(i3)
-			FLUSH(i4)
+			pliFLUSH(i0)
+			pliFLUSH(i1)
+			pliFLUSH(i2)
+			pliFLUSH(i3)
+			pliFLUSH(i4)
 
 			switch(N)
 				// We have to change how subtraction is done depending on the value of
@@ -897,39 +869,39 @@ pif_LongInt/UnsignedDouble
 				// to).
 
 				if(1)
-					src1 = BYTE_ONE(src1) + BYTE_ONE_N(i1) + 1
-					src0 = BYTE_ONE(src0) + BYTE_ONE_N(i0) + BUFFER(src1)
+					src1 = pliBYTE_ONE(src1) + pliBYTE_ONE_N(i1) + 1
+					src0 = pliBYTE_ONE(src0) + pliBYTE_ONE_N(i0) + pliBUFFER(src1)
 
 				if(2)
-					src2 = BYTE_ONE(src2) + BYTE_ONE_N(i2) + 1
-					src1 = BYTE_ONE(src1) + BYTE_ONE_N(i1) + BUFFER(src2)
-					src0 = BYTE_ONE(src0) + BYTE_ONE_N(i0) + BUFFER(src1)
+					src2 = pliBYTE_ONE(src2) + pliBYTE_ONE_N(i2) + 1
+					src1 = pliBYTE_ONE(src1) + pliBYTE_ONE_N(i1) + pliBUFFER(src2)
+					src0 = pliBYTE_ONE(src0) + pliBYTE_ONE_N(i0) + pliBUFFER(src1)
 
 				if(3)
-					src3 = BYTE_ONE(src3) + BYTE_ONE_N(i3) + 1
-					src2 = BYTE_ONE(src2) + BYTE_ONE_N(i2) + BUFFER(src3)
-					src1 = BYTE_ONE(src1) + BYTE_ONE_N(i1) + BUFFER(src2)
-					src0 = BYTE_ONE(src0) + BYTE_ONE_N(i0) + BUFFER(src1)
+					src3 = pliBYTE_ONE(src3) + pliBYTE_ONE_N(i3) + 1
+					src2 = pliBYTE_ONE(src2) + pliBYTE_ONE_N(i2) + pliBUFFER(src3)
+					src1 = pliBYTE_ONE(src1) + pliBYTE_ONE_N(i1) + pliBUFFER(src2)
+					src0 = pliBYTE_ONE(src0) + pliBYTE_ONE_N(i0) + pliBUFFER(src1)
 
 				if(4)
-					src4 = BYTE_ONE(src4) + BYTE_ONE_N(i4) + 1
-					src3 = BYTE_ONE(src3) + BYTE_ONE_N(i3) + BUFFER(src4)
-					src2 = BYTE_ONE(src2) + BYTE_ONE_N(i2) + BUFFER(src3)
-					src1 = BYTE_ONE(src1) + BYTE_ONE_N(i1) + BUFFER(src2)
-					src0 = BYTE_ONE(src0) + BYTE_ONE_N(i0) + BUFFER(src1)
+					src4 = pliBYTE_ONE(src4) + pliBYTE_ONE_N(i4) + 1
+					src3 = pliBYTE_ONE(src3) + pliBYTE_ONE_N(i3) + pliBUFFER(src4)
+					src2 = pliBYTE_ONE(src2) + pliBYTE_ONE_N(i2) + pliBUFFER(src3)
+					src1 = pliBYTE_ONE(src1) + pliBYTE_ONE_N(i1) + pliBUFFER(src2)
+					src0 = pliBYTE_ONE(src0) + pliBYTE_ONE_N(i0) + pliBUFFER(src1)
 
-			if(BUFFER(src0) == 0)
-				// If BUFFER(src0) == 0, then we rolled over and need to set
+			if(pliBUFFER(src0) == 0)
+				// If pliBUFFER(src0) == 0, then we rolled over and need to set
 				// the relevant flag.
 				rollover_flag = 1
 			else
 				rollover_flag = 0
 
-			FLUSH(src0)
-			FLUSH(src1)
-			FLUSH(src2)
-			FLUSH(src3)
-			FLUSH(src4)
+			pliFLUSH(src0)
+			pliFLUSH(src1)
+			pliFLUSH(src2)
+			pliFLUSH(src3)
+			pliFLUSH(src4)
 
 			// Step D5 [Test remainder.]
 
@@ -948,32 +920,32 @@ pif_LongInt/UnsignedDouble
 				switch(N)
 
 					if(1)
-						src1 = BYTE_ONE(src1) + BYTE_ONE(Int1)
-						src0 = BYTE_ONE(src0)                  + BUFFER(src1)
+						src1 = pliBYTE_ONE(src1) + pliBYTE_ONE(Int1)
+						src0 = pliBYTE_ONE(src0)                  + pliBUFFER(src1)
 
 					if(2)
-						src2 = BYTE_ONE(src2) + BYTE_ONE(Int2)
-						src1 = BYTE_ONE(src1) + BYTE_ONE(Int1) + BUFFER(src2)
-						src0 = BYTE_ONE(src0)                  + BUFFER(src1)
+						src2 = pliBYTE_ONE(src2) + pliBYTE_ONE(Int2)
+						src1 = pliBYTE_ONE(src1) + pliBYTE_ONE(Int1) + pliBUFFER(src2)
+						src0 = pliBYTE_ONE(src0)                  + pliBUFFER(src1)
 
 					if(3)
-						src3 = BYTE_ONE(src3) + BYTE_ONE(Int3)
-						src2 = BYTE_ONE(src2) + BYTE_ONE(Int2) + BUFFER(src3)
-						src1 = BYTE_ONE(src1) + BYTE_ONE(Int1) + BUFFER(src2)
-						src0 = BYTE_ONE(src0)                  + BUFFER(src1)
+						src3 = pliBYTE_ONE(src3) + pliBYTE_ONE(Int3)
+						src2 = pliBYTE_ONE(src2) + pliBYTE_ONE(Int2) + pliBUFFER(src3)
+						src1 = pliBYTE_ONE(src1) + pliBYTE_ONE(Int1) + pliBUFFER(src2)
+						src0 = pliBYTE_ONE(src0)                  + pliBUFFER(src1)
 
 					if(4)
-						src4 = BYTE_ONE(src4) + BYTE_ONE(Int4)
-						src3 = BYTE_ONE(src3) + BYTE_ONE(Int3) + BUFFER(src4)
-						src2 = BYTE_ONE(src2) + BYTE_ONE(Int2) + BUFFER(src3)
-						src1 = BYTE_ONE(src1) + BYTE_ONE(Int1) + BUFFER(src2)
-						src0 = BYTE_ONE(src0)                  + BUFFER(src1)
+						src4 = pliBYTE_ONE(src4) + pliBYTE_ONE(Int4)
+						src3 = pliBYTE_ONE(src3) + pliBYTE_ONE(Int3) + pliBUFFER(src4)
+						src2 = pliBYTE_ONE(src2) + pliBYTE_ONE(Int2) + pliBUFFER(src3)
+						src1 = pliBYTE_ONE(src1) + pliBYTE_ONE(Int1) + pliBUFFER(src2)
+						src0 = pliBYTE_ONE(src0)                  + pliBUFFER(src1)
 
-				FLUSH(src0)
-				FLUSH(src1)
-				FLUSH(src2)
-				FLUSH(src3)
-				FLUSH(src4)
+				pliFLUSH(src0)
+				pliFLUSH(src1)
+				pliFLUSH(src2)
+				pliFLUSH(src3)
+				pliFLUSH(src4)
 
 		quot_size = 1
 
@@ -990,7 +962,7 @@ pif_LongInt/UnsignedDouble
 			// Step D3 [Calculate q-hat.]
 
 			if(src1 == Int1)	qhat = base - 1
-			else				qhat = FLOOR( (src1*base + src2) / Int1 )
+			else				qhat = pliFLOOR( (src1*base + src2) / Int1 )
 
 			while( (Int2*qhat) > ((src1*base + src2 - Int1*qhat)*base + src3) )
 				qhat --
@@ -1002,16 +974,16 @@ pif_LongInt/UnsignedDouble
 			// we proceed.
 
 				i4 = qhat*Int4
-				i3 = qhat*Int3 + BUFFER(i4)
-				i2 = qhat*Int2 + BUFFER(i3)
-				i1 = qhat*Int1 + BUFFER(i2)
-				i0 = BUFFER(i1)
+				i3 = qhat*Int3 + pliBUFFER(i4)
+				i2 = qhat*Int2 + pliBUFFER(i3)
+				i1 = qhat*Int1 + pliBUFFER(i2)
+				i0 = pliBUFFER(i1)
 
-				FLUSH(i0)
-				FLUSH(i1)
-				FLUSH(i2)
-				FLUSH(i3)
-				FLUSH(i4)
+				pliFLUSH(i0)
+				pliFLUSH(i1)
+				pliFLUSH(i2)
+				pliFLUSH(i3)
+				pliFLUSH(i4)
 
 				switch(N)
 					// We have to change how subtraction is done depending on the value of
@@ -1019,33 +991,33 @@ pif_LongInt/UnsignedDouble
 					// to).
 
 					if(1)
-						src2 = BYTE_ONE(src2) + BYTE_ONE_N(i1) + 1
-						src1 = BYTE_ONE(src1) + BYTE_ONE_N(i0) + BUFFER(src2)
+						src2 = pliBYTE_ONE(src2) + pliBYTE_ONE_N(i1) + 1
+						src1 = pliBYTE_ONE(src1) + pliBYTE_ONE_N(i0) + pliBUFFER(src2)
 
 					if(2)
-						src3 = BYTE_ONE(src3) + BYTE_ONE_N(i2) + 1
-						src2 = BYTE_ONE(src2) + BYTE_ONE_N(i1) + BUFFER(src3)
-						src1 = BYTE_ONE(src1) + BYTE_ONE_N(i0) + BUFFER(src2)
+						src3 = pliBYTE_ONE(src3) + pliBYTE_ONE_N(i2) + 1
+						src2 = pliBYTE_ONE(src2) + pliBYTE_ONE_N(i1) + pliBUFFER(src3)
+						src1 = pliBYTE_ONE(src1) + pliBYTE_ONE_N(i0) + pliBUFFER(src2)
 
 					if(3)
-						src4 = BYTE_ONE(src4) + BYTE_ONE_N(i3) + 1
-						src3 = BYTE_ONE(src3) + BYTE_ONE_N(i2) + BUFFER(src4)
-						src2 = BYTE_ONE(src2) + BYTE_ONE_N(i1) + BUFFER(src3)
-						src1 = BYTE_ONE(src1) + BYTE_ONE_N(i0) + BUFFER(src2)
+						src4 = pliBYTE_ONE(src4) + pliBYTE_ONE_N(i3) + 1
+						src3 = pliBYTE_ONE(src3) + pliBYTE_ONE_N(i2) + pliBUFFER(src4)
+						src2 = pliBYTE_ONE(src2) + pliBYTE_ONE_N(i1) + pliBUFFER(src3)
+						src1 = pliBYTE_ONE(src1) + pliBYTE_ONE_N(i0) + pliBUFFER(src2)
 
 					// If N == 4, then this entire iteration will not be performed.
 
-				if(BUFFER(src1) == 0)
-					// If BUFFER(src0) == 0, then we rolled over and need to set
+				if(pliBUFFER(src1) == 0)
+					// If pliBUFFER(src0) == 0, then we rolled over and need to set
 					// the relevant flag.
 					rollover_flag = 1
 				else
 					rollover_flag = 0
 
-				FLUSH(src1)
-				FLUSH(src2)
-				FLUSH(src3)
-				FLUSH(src4)
+				pliFLUSH(src1)
+				pliFLUSH(src2)
+				pliFLUSH(src3)
+				pliFLUSH(src4)
 
 				// Step D5 [Test remainder.]
 
@@ -1064,24 +1036,24 @@ pif_LongInt/UnsignedDouble
 					switch(N)
 
 						if(1)
-							src2 = BYTE_ONE(src2) + BYTE_ONE(Int1)
-							src1 = BYTE_ONE(src1)                  + BUFFER(src2)
+							src2 = pliBYTE_ONE(src2) + pliBYTE_ONE(Int1)
+							src1 = pliBYTE_ONE(src1)                  + pliBUFFER(src2)
 
 						if(2)
-							src3 = BYTE_ONE(src3) + BYTE_ONE(Int2)
-							src2 = BYTE_ONE(src2) + BYTE_ONE(Int1) + BUFFER(src3)
-							src1 = BYTE_ONE(src1)                  + BUFFER(src2)
+							src3 = pliBYTE_ONE(src3) + pliBYTE_ONE(Int2)
+							src2 = pliBYTE_ONE(src2) + pliBYTE_ONE(Int1) + pliBUFFER(src3)
+							src1 = pliBYTE_ONE(src1)                  + pliBUFFER(src2)
 
 						if(3)
-							src4 = BYTE_ONE(src4) + BYTE_ONE(Int3)
-							src3 = BYTE_ONE(src3) + BYTE_ONE(Int2) + BUFFER(src4)
-							src2 = BYTE_ONE(src2) + BYTE_ONE(Int1) + BUFFER(src3)
-							src1 = BYTE_ONE(src1)                  + BUFFER(src2)
+							src4 = pliBYTE_ONE(src4) + pliBYTE_ONE(Int3)
+							src3 = pliBYTE_ONE(src3) + pliBYTE_ONE(Int2) + pliBUFFER(src4)
+							src2 = pliBYTE_ONE(src2) + pliBYTE_ONE(Int1) + pliBUFFER(src3)
+							src1 = pliBYTE_ONE(src1)                  + pliBUFFER(src2)
 
-					FLUSH(src1)
-					FLUSH(src2)
-					FLUSH(src3)
-					FLUSH(src4)
+					pliFLUSH(src1)
+					pliFLUSH(src2)
+					pliFLUSH(src3)
+					pliFLUSH(src4)
 
 			quot_size = 2
 
@@ -1098,7 +1070,7 @@ pif_LongInt/UnsignedDouble
 			// Step D3 [Calculate q-hat.]
 
 			if(src2 == Int1)	qhat = base - 1
-			else				qhat = FLOOR( (src2*base + src3) / Int1 )
+			else				qhat = pliFLOOR( (src2*base + src3) / Int1 )
 
 			while( (Int2*qhat) > ((src2*base + src3 - Int1*qhat)*base + src4) )
 				qhat --
@@ -1110,16 +1082,16 @@ pif_LongInt/UnsignedDouble
 			// we proceed..
 
 				i4 = qhat*Int4
-				i3 = qhat*Int3 + BUFFER(i4)
-				i2 = qhat*Int2 + BUFFER(i3)
-				i1 = qhat*Int1 + BUFFER(i2)
-				i0 = BUFFER(i1)
+				i3 = qhat*Int3 + pliBUFFER(i4)
+				i2 = qhat*Int2 + pliBUFFER(i3)
+				i1 = qhat*Int1 + pliBUFFER(i2)
+				i0 = pliBUFFER(i1)
 
-				FLUSH(i0)
-				FLUSH(i1)
-				FLUSH(i2)
-				FLUSH(i3)
-				FLUSH(i4)
+				pliFLUSH(i0)
+				pliFLUSH(i1)
+				pliFLUSH(i2)
+				pliFLUSH(i3)
+				pliFLUSH(i4)
 
 				switch(N)
 					// We have to change how subtraction is done depending on the value of
@@ -1127,26 +1099,26 @@ pif_LongInt/UnsignedDouble
 					// to).
 
 					if(1)
-						src3 = BYTE_ONE(src3) + BYTE_ONE_N(i1) + 1
-						src2 = BYTE_ONE(src2) + BYTE_ONE_N(i0) + BUFFER(src3)
+						src3 = pliBYTE_ONE(src3) + pliBYTE_ONE_N(i1) + 1
+						src2 = pliBYTE_ONE(src2) + pliBYTE_ONE_N(i0) + pliBUFFER(src3)
 
 					if(2)
-						src4 = BYTE_ONE(src4) + BYTE_ONE_N(i2) + 1
-						src3 = BYTE_ONE(src3) + BYTE_ONE_N(i1) + BUFFER(src4)
-						src2 = BYTE_ONE(src2) + BYTE_ONE_N(i0) + BUFFER(src3)
+						src4 = pliBYTE_ONE(src4) + pliBYTE_ONE_N(i2) + 1
+						src3 = pliBYTE_ONE(src3) + pliBYTE_ONE_N(i1) + pliBUFFER(src4)
+						src2 = pliBYTE_ONE(src2) + pliBYTE_ONE_N(i0) + pliBUFFER(src3)
 
 					// If N == 3 or N == 4, then this entire iteration will not be performed.
 
-				if(BUFFER(src2) == 0)
-					// If BUFFER(src0) == 0, then we rolled over and need to set
+				if(pliBUFFER(src2) == 0)
+					// If pliBUFFER(src0) == 0, then we rolled over and need to set
 					// the relevant flag.
 					rollover_flag = 1
 				else
 					rollover_flag = 0
 
-				FLUSH(src2)
-				FLUSH(src3)
-				FLUSH(src4)
+				pliFLUSH(src2)
+				pliFLUSH(src3)
+				pliFLUSH(src4)
 
 				// Step D5 [Test remainder.]
 
@@ -1165,17 +1137,17 @@ pif_LongInt/UnsignedDouble
 					switch(N)
 
 						if(1)
-							src3 = BYTE_ONE(src3) + BYTE_ONE(Int1)
-							src2 = BYTE_ONE(src2)                  + BUFFER(src3)
+							src3 = pliBYTE_ONE(src3) + pliBYTE_ONE(Int1)
+							src2 = pliBYTE_ONE(src2)                  + pliBUFFER(src3)
 
 						if(2)
-							src4 = BYTE_ONE(src4) + BYTE_ONE(Int2)
-							src3 = BYTE_ONE(src3) + BYTE_ONE(Int1) + BUFFER(src4)
-							src2 = BYTE_ONE(src2)                  + BUFFER(src3)
+							src4 = pliBYTE_ONE(src4) + pliBYTE_ONE(Int2)
+							src3 = pliBYTE_ONE(src3) + pliBYTE_ONE(Int1) + pliBUFFER(src4)
+							src2 = pliBYTE_ONE(src2)                  + pliBUFFER(src3)
 
-					FLUSH(src2)
-					FLUSH(src3)
-					FLUSH(src4)
+					pliFLUSH(src2)
+					pliFLUSH(src3)
+					pliFLUSH(src4)
 
 			quot_size = 3
 
@@ -1192,7 +1164,7 @@ pif_LongInt/UnsignedDouble
 			// Step D3 [Calculate q-hat.]
 
 			if(src3 == Int1)	qhat = base - 1
-			else				qhat = FLOOR( (src3*base + src4) / Int1 )
+			else				qhat = pliFLOOR( (src3*base + src4) / Int1 )
 
 			while( (Int2*qhat) > (src3*base + src4 - Int1*qhat)*base )
 				qhat --
@@ -1204,29 +1176,29 @@ pif_LongInt/UnsignedDouble
 				// we proceed..
 
 				i4 = qhat*Int4
-				i3 = qhat*Int3 + BUFFER(i4)
-				i2 = qhat*Int2 + BUFFER(i3)
-				i1 = qhat*Int1 + BUFFER(i2)
-				i0 = BUFFER(i1)
+				i3 = qhat*Int3 + pliBUFFER(i4)
+				i2 = qhat*Int2 + pliBUFFER(i3)
+				i1 = qhat*Int1 + pliBUFFER(i2)
+				i0 = pliBUFFER(i1)
 
-				FLUSH(i0)
-				FLUSH(i1)
-				FLUSH(i2)
-				FLUSH(i3)
-				FLUSH(i4)
+				pliFLUSH(i0)
+				pliFLUSH(i1)
+				pliFLUSH(i2)
+				pliFLUSH(i3)
+				pliFLUSH(i4)
 
-				src4 = BYTE_ONE(src4) + BYTE_ONE_N(i1) + 1
-				src3 = BYTE_ONE(src3) + BYTE_ONE_N(i0) + BUFFER(src4)
+				src4 = pliBYTE_ONE(src4) + pliBYTE_ONE_N(i1) + 1
+				src3 = pliBYTE_ONE(src3) + pliBYTE_ONE_N(i0) + pliBUFFER(src4)
 
-				if(BUFFER(src3) == 0)
-					// If BUFFER(src0) == 0, then we rolled over and need to set
+				if(pliBUFFER(src3) == 0)
+					// If pliBUFFER(src0) == 0, then we rolled over and need to set
 					// the relevant flag.
 					rollover_flag = 1
 				else
 					rollover_flag = 0
 
-				FLUSH(src3)
-				FLUSH(src4)
+				pliFLUSH(src3)
+				pliFLUSH(src4)
 
 				// Step D5 [Test remainder.]
 
@@ -1241,11 +1213,11 @@ pif_LongInt/UnsignedDouble
 
 					// And add Int to (src3, src4).
 
-					src4 = BYTE_ONE(src4) + BYTE_ONE(Int1)
-					src3 = BYTE_ONE(src3)                  + BUFFER(src4)
+					src4 = pliBYTE_ONE(src4) + pliBYTE_ONE(Int1)
+					src3 = pliBYTE_ONE(src3)                  + pliBUFFER(src4)
 
-					FLUSH(src3)
-					FLUSH(src4)
+					pliFLUSH(src3)
+					pliFLUSH(src4)
 
 			quot_size = 4
 
@@ -1268,7 +1240,7 @@ pif_LongInt/UnsignedDouble
 											// to get the remainder.
 		)
 
-	Quotient(....)
+	Quotient(...)
 		var
 			// Get the data from _AlgorithmD
 			list
@@ -1300,15 +1272,15 @@ pif_LongInt/UnsignedDouble
 				Quot._SetBlock(1, D[2]                          )
 
 			if(2)
-				Quot._SetBlock(1, D[3] | BYTE_ONE_SHIFTED(D[2]) )
+				Quot._SetBlock(1, D[3] | pliBYTE_ONE_SHIFTED(D[2]) )
 
 			if(3)
 				Quot._SetBlock(2, D[2])
-				Quot._SetBlock(1, D[4] | BYTE_ONE_SHIFTED(D[3]) )
+				Quot._SetBlock(1, D[4] | pliBYTE_ONE_SHIFTED(D[3]) )
 
 			if(4)
-				Quot._SetBlock(2, D[3] | BYTE_ONE_SHIFTED(D[2]) )
-				Quot._SetBlock(1, D[5] | BYTE_ONE_SHIFTED(D[4]) )
+				Quot._SetBlock(2, D[3] | pliBYTE_ONE_SHIFTED(D[2]) )
+				Quot._SetBlock(1, D[5] | pliBYTE_ONE_SHIFTED(D[4]) )
 
 		return Quot
 
@@ -1406,21 +1378,21 @@ pif_LongInt/UnsignedDouble
 			q2
 			q3
 
-		q0 = FLOOR(byte_1 / adj)
+		q0 = pliFLOOR(byte_1 / adj)
 		byte_1 -= adj*q0
 
-		q1 = FLOOR( (byte_1*256 + byte_2) / adj)
-		byte_1 = (BYTE_ONE_SHIFTED(byte_1) | byte_2) - (adj*q1)
-		byte_2 = DATA(byte_1)
+		q1 = pliFLOOR( (byte_1*256 + byte_2) / adj)
+		byte_1 = (pliBYTE_ONE_SHIFTED(byte_1) | byte_2) - (adj*q1)
+		byte_2 = pliDATA(byte_1)
 
-		q2 = FLOOR( (byte_2*256 + byte_3) / adj)
-		byte_2 = (BYTE_ONE_SHIFTED(byte_2) | byte_3) - (adj*q2)
-		byte_3 = DATA(byte_2)
+		q2 = pliFLOOR( (byte_2*256 + byte_3) / adj)
+		byte_2 = (pliBYTE_ONE_SHIFTED(byte_2) | byte_3) - (adj*q2)
+		byte_3 = pliDATA(byte_2)
 
-		q3 = FLOOR( (byte_3*256 + byte_4) / adj)
+		q3 = pliFLOOR( (byte_3*256 + byte_4) / adj)
 
-		Rem._SetBlock(2, BYTE_ONE_SHIFTED(q0) | q1)
-		Rem._SetBlock(1, BYTE_ONE_SHIFTED(q2) | q3)
+		Rem._SetBlock(2, pliBYTE_ONE_SHIFTED(q0) | q1)
+		Rem._SetBlock(1, pliBYTE_ONE_SHIFTED(q2) | q3)
 
 		return Rem
 
@@ -1474,15 +1446,15 @@ pif_LongInt/UnsignedDouble
 				Quot._SetBlock(1, D[2]                          )
 
 			if(2)
-				Quot._SetBlock(1, D[3] | BYTE_ONE_SHIFTED(D[2]) )
+				Quot._SetBlock(1, D[3] | pliBYTE_ONE_SHIFTED(D[2]) )
 
 			if(3)
 				Quot._SetBlock(2, D[2])
-				Quot._SetBlock(1, D[4] | BYTE_ONE_SHIFTED(D[3]) )
+				Quot._SetBlock(1, D[4] | pliBYTE_ONE_SHIFTED(D[3]) )
 
 			if(4)
-				Quot._SetBlock(2, D[3] | BYTE_ONE_SHIFTED(D[2]) )
-				Quot._SetBlock(1, D[5] | BYTE_ONE_SHIFTED(D[4]) )
+				Quot._SetBlock(2, D[3] | pliBYTE_ONE_SHIFTED(D[2]) )
+				Quot._SetBlock(1, D[5] | pliBYTE_ONE_SHIFTED(D[4]) )
 
 		// Remainder.
 
@@ -1559,21 +1531,21 @@ pif_LongInt/UnsignedDouble
 			q2
 			q3
 
-		q0 = FLOOR(byte_1 / adj)
+		q0 = pliFLOOR(byte_1 / adj)
 		byte_1 -= adj*q0
 
-		q1 = FLOOR( (byte_1*256 + byte_2) / adj)
-		byte_1 = (BYTE_ONE_SHIFTED(byte_1) | byte_2) - (adj*q1)
-		byte_2 = DATA(byte_1)
+		q1 = pliFLOOR( (byte_1*256 + byte_2) / adj)
+		byte_1 = (pliBYTE_ONE_SHIFTED(byte_1) | byte_2) - (adj*q1)
+		byte_2 = pliDATA(byte_1)
 
-		q2 = FLOOR( (byte_2*256 + byte_3) / adj)
-		byte_2 = (BYTE_ONE_SHIFTED(byte_2) | byte_3) - (adj*q2)
-		byte_3 = DATA(byte_2)
+		q2 = pliFLOOR( (byte_2*256 + byte_3) / adj)
+		byte_2 = (pliBYTE_ONE_SHIFTED(byte_2) | byte_3) - (adj*q2)
+		byte_3 = pliDATA(byte_2)
 
-		q3 = FLOOR( (byte_3*256 + byte_4) / adj)
+		q3 = pliFLOOR( (byte_3*256 + byte_4) / adj)
 
-		Rem._SetBlock(2, BYTE_ONE_SHIFTED(q0) | q1)
-		Rem._SetBlock(1, BYTE_ONE_SHIFTED(q2) | q3)
+		Rem._SetBlock(2, pliBYTE_ONE_SHIFTED(q0) | q1)
+		Rem._SetBlock(1, pliBYTE_ONE_SHIFTED(q2) | q3)
 
 		/*
 		 * Send it back whence it came.
@@ -1602,17 +1574,17 @@ pif_LongInt/UnsignedDouble
 			B1 = 0
 			B2 = 0
 
-		B1 = BYTE_ONE(block_1) + 1
-		B2 = BYTE_TWO(block_1) + BUFFER(B1)
+		B1 = pliBYTE_ONE(block_1) + 1
+		B2 = pliBYTE_TWO(block_1) + pliBUFFER(B1)
 
-		Sum._SetBlock(1, BYTE_ONE(B1) | BYTE_ONE_SHIFTED(B2))
+		Sum._SetBlock(1, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
-		B1 = BYTE_ONE(block_2) + BUFFER(B2)
-		B2 = BYTE_TWO(block_2) + BUFFER(B1)
+		B1 = pliBYTE_ONE(block_2) + pliBUFFER(B2)
+		B2 = pliBYTE_TWO(block_2) + pliBUFFER(B1)
 
-		Sum._SetBlock(2, BYTE_ONE(B1) | BYTE_ONE_SHIFTED(B2))
+		Sum._SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
-		if( (BUFFER(B2) != 0) && (mode & OVERFLOW_EXCEPTION) )
+		if( (pliBUFFER(B2) != 0) && (mode & OVERFLOW_EXCEPTION) )
 			// If B2's buffer is not equal to zero, then we overflowed and need
 			// to throw the OverflowException if it's flag set.
 
@@ -1642,17 +1614,17 @@ pif_LongInt/UnsignedDouble
 			B1 = 0
 			B2 = 0
 
-		B1 = BYTE_ONE(block_1) + 0x00FF
-		B2 = BYTE_TWO(block_1) + BUFFER(B1) + 0x00FF
+		B1 = pliBYTE_ONE(block_1) + 0x00FF
+		B2 = pliBYTE_TWO(block_1) + pliBUFFER(B1) + 0x00FF
 
-		Diff._SetBlock(1, BYTE_ONE(B1) | BYTE_ONE_SHIFTED(B2))
+		Diff._SetBlock(1, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
-		B1 = BYTE_ONE(block_2) + BUFFER(B2) + 0x00FF
-		B2 = BYTE_TWO(block_2) + BUFFER(B1) + 0x00FF
+		B1 = pliBYTE_ONE(block_2) + pliBUFFER(B2) + 0x00FF
+		B2 = pliBYTE_TWO(block_2) + pliBUFFER(B1) + 0x00FF
 
-		Diff._SetBlock(2, BYTE_ONE(B1) | BYTE_ONE_SHIFTED(B2))
+		Diff._SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
-		if( (BUFFER(B2) == 0) && (mode & OVERFLOW_EXCEPTION) )
+		if( (pliBUFFER(B2) == 0) && (mode & OVERFLOW_EXCEPTION) )
 			// If B2's buffer is equal to zero, then there was a negative
 			// overflow. Thus, we need to possibly throw the OverflowException.
 
@@ -1681,10 +1653,10 @@ pif_LongInt/UnsignedDouble
 
 			// Bytes of src.
 
-			src0 = BYTE_ONE(block_1)
-			src1 = BYTE_TWO(block_1)
-			src2 = BYTE_ONE(block_2)
-			src3 = BYTE_TWO(block_2)
+			src0 = pliBYTE_ONE(block_1)
+			src1 = pliBYTE_TWO(block_1)
+			src2 = pliBYTE_ONE(block_2)
+			src3 = pliBYTE_TWO(block_2)
 
 			// Bytes of the final result's blocks. As in the multiply method, the first byte of each
 			// of these is the actual value, while the second byte is a buffer until that data is
@@ -1730,64 +1702,64 @@ pif_LongInt/UnsignedDouble
 
 		byte_1 = src0*src0
 
-		ADDBUFFER(byte_1, byte_2)
-		FLUSH(byte_1)
+		pliADDBUFFER(byte_1, byte_2)
+		pliFLUSH(byte_1)
 
 		// Terms with coefficient R**1 == R.
 
 		buffer = src0*src1
 
-		ADDDATA_T2(buffer, byte_2)
-		byte_3 = BUFFER(byte_2) + BUFFER_T2(buffer)
-		ADDBUFFER(byte_3, byte_4) // byte_4 = 0 before this operation. Because only the buffer is
+		pliADDDATA_T2(buffer, byte_2)
+		byte_3 = pliBUFFER(byte_2) + pliBUFFER_T2(buffer)
+		pliADDBUFFER(byte_3, byte_4) // byte_4 = 0 before this operation. Because only the buffer is
 								  // being added, after the operation byte_4 <= 255.
 
-		FLUSH(byte_2)
-		FLUSH(byte_3)
+		pliFLUSH(byte_2)
+		pliFLUSH(byte_3)
 
 		// Terms with coefficient R**2.
 
 		if(overflow_flag || !(mode & OVERFLOW_EXCEPTION))
 			buffer = src1*src1
-			ADDDATA(buffer, byte_3)
-			byte_4 += BUFFER(byte_3) + BUFFER(buffer)
-			FLUSH(byte_3)
-			FLUSH(byte_4)
+			pliADDDATA(buffer, byte_3)
+			byte_4 += pliBUFFER(byte_3) + pliBUFFER(buffer)
+			pliFLUSH(byte_3)
+			pliFLUSH(byte_4)
 
 			buffer = src0*src2
-			ADDDATA_T2(buffer, byte_3)
-			byte_4 += BUFFER(byte_3) + BUFFER_T2(buffer)
-			FLUSH(byte_3)
-			FLUSH(byte_4)
+			pliADDDATA_T2(buffer, byte_3)
+			byte_4 += pliBUFFER(byte_3) + pliBUFFER_T2(buffer)
+			pliFLUSH(byte_3)
+			pliFLUSH(byte_4)
 
 		else
 			buffer = src1*src1
-			ADDDATA(buffer, byte_3)
-			byte_4 += BUFFER(byte_3) + BUFFER(buffer)
-			if(!overflow_flag && (BUFFER(byte_4) != 0))
+			pliADDDATA(buffer, byte_3)
+			byte_4 += pliBUFFER(byte_3) + pliBUFFER(buffer)
+			if(!overflow_flag && (pliBUFFER(byte_4) != 0))
 				overflow_flag = 1
 
-			FLUSH(byte_3)
-			FLUSH(byte_4)
+			pliFLUSH(byte_3)
+			pliFLUSH(byte_4)
 
 			buffer = src0*src2
-			ADDDATA_T2(buffer, byte_3)
-			byte_4 += BUFFER(byte_3) + BUFFER_T2(buffer)
-			if(!overflow_flag && (BUFFER(byte_4) != 0))
+			pliADDDATA_T2(buffer, byte_3)
+			byte_4 += pliBUFFER(byte_3) + pliBUFFER_T2(buffer)
+			if(!overflow_flag && (pliBUFFER(byte_4) != 0))
 				overflow_flag = 1
 
-			FLUSH(byte_3)
-			FLUSH(byte_4)
+			pliFLUSH(byte_3)
+			pliFLUSH(byte_4)
 
 		// Terms with coefficient R**3.
 
 		if(overflow_flag || !(mode & OVERFLOW_EXCEPTION))
-			byte_4 += DATA_T2(src0*src3)
-			if(!overflow_flag && (BUFFER(byte_4) != 0))
+			byte_4 += pliDATA_T2(src0*src3)
+			if(!overflow_flag && (pliBUFFER(byte_4) != 0))
 				overflow_flag = 1
 
-			byte_4 += DATA_T2(src1*src2)
-			if(!overflow_flag && (BUFFER(byte_4) != 0))
+			byte_4 += pliDATA_T2(src1*src2)
+			if(!overflow_flag && (pliBUFFER(byte_4) != 0))
 				overflow_flag = 1
 
 		// Now we check, as with multipliation, the last few that indicate an overflow
@@ -1802,8 +1774,8 @@ pif_LongInt/UnsignedDouble
 		 * Glue the pieces back together, and deliver the result.
 		 */
 
-		Square._SetBlock(1, byte_1 | BYTE_ONE_SHIFTED(byte_2) )
-		Square._SetBlock(2, byte_3 | BYTE_ONE_SHIFTED(byte_4) )
+		Square._SetBlock(1, byte_1 | pliBYTE_ONE_SHIFTED(byte_2) )
+		Square._SetBlock(2, byte_3 | pliBYTE_ONE_SHIFTED(byte_4) )
 
 		if(overflow_flag && (mode & OVERFLOW_EXCEPTION))
 			// If overflow occured and we need to report it, then throw the OverflowException.
