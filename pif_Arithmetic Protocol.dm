@@ -40,9 +40,6 @@
     - Added FirstFirstSet() and FindLastSet() methods.
     - Changed Highest() and Lowest() to Maximum() and Minumum(), respectively.
     - Clarified the behavior of the PrintBinary(), PrintDecimal(), and PrintHexadecimal() methods.
-    - Added notes about the relationship between Quotient() and Remainder().
-    - Added note about the legal output values of Remainder().
-    - Added a note about restrictions on the output of Divide().
 
   Version b1.0.20160409.
 
@@ -328,13 +325,6 @@ If the format provided for a GAAF-specified method does not match one of the abo
 
 			    An object of the same type as the source object.
 
-			  Note.
-
-			    If A is the dividend (source object) and B is the divisor (argument) then the following
-			    relationship should always hold between Quotient() and Remainder():
-
-			      B * (A.Quotient(B)) + (A.Remainder(B)) == A.
-
 			*/
 
 		Remainder(...)
@@ -358,17 +348,6 @@ If the format provided for a GAAF-specified method does not match one of the abo
 			  Returns.
 
 			    An object of the same type as the source object.
-
-			  Note.
-
-			    If A is the dividend (source object) and B is the divisor (argument) then the following
-			    relationship should always hold between Quotient() and Remainder():
-
-			      B * (A.Quotient(B)) + (A.Remainder(B)) == A.
-
-			    Furthermore, Remainder() should have the property that
-
-			      0 <= |A.Remainder(B)| < |B|.
 
 			*/
 
@@ -416,7 +395,7 @@ If the format provided for a GAAF-specified method does not match one of the abo
 		Divide(...)
 			/*
 
-			Computes the quotient and remainder of division.
+			Computes the quotient remainder of division.
 
 			  Arguments.
 
@@ -436,9 +415,8 @@ If the format provided for a GAAF-specified method does not match one of the abo
 			  Returns.
 
 			    A /list object, where the first element stores the quotient and the second stores
-			    the remainder. The first element of this list should have the same value as the
-			    Quotient() method would output, while the second element of this list should have
-			    the same value as the Remainder() method would output.
+			    the remainder.
+
 			*/
 
 		Increment()
