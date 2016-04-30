@@ -1430,9 +1430,6 @@ pif_LongInt/UnsignedDouble
 		Processed = _Process(args)
 		D = _AlgorithmD(Processed[1], Processed[2])
 
-		// Rem will change itself rather than outputting an new object.
-		Rem.SetModeFlag(NEW_OBJECT, 0)
-
 		// Quotient.
 
 		switch(D[1]) // switch(quot_size)
