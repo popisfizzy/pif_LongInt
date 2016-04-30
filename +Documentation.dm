@@ -1,7 +1,7 @@
 /**
  ** pif_LongInt
- **   Version: b1.1.201604##
- **   Release Date: April ##, 2016
+ **   Version: b1.1.2016####
+ **   Release Date: Month ##, 2016
  **
  ***************************************************************************************************
  ***************************************************************************************************
@@ -37,13 +37,14 @@ double precision integer is available.
   3. Release Notes
   ----------------------------------------------------
 
-  Version b1.1.201604##.
+  Version b1.1.2016####.
 
     - Fixed several errors in computing remainders and quotients in division.
     - Added more documentation to functions.
     - Made additions and modifications to the pif_Arithmetic protocol. Refer to
-      "pif_Arithmetic Protocol".dm to see these changes.
-    - Made some rewrites to Remainder() and Divide(), significantly increasing their speed.
+      "pif_Arithmetic Protocol.dm" to see these changes.
+    - Made rewrites to /UnsignedDouble.Remainder() and /UnsignedDouble.Divide(), significantly
+      increasing their speeed.
 
   Version b1.0.20160409.
 

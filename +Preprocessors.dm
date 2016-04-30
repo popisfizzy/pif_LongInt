@@ -12,7 +12,6 @@
 
 #define	pliFLOOR(X) 			round(X) // This is the largest integer less than X.
 
-//
 // These macros are used to make the behavior of the code in this library cleaner in its
 // presentation and clearer in its purpose. The clarity comes from two counts: the first is
 // that bit manipulation can often be a bit opaque and hard to follow, while the other is
