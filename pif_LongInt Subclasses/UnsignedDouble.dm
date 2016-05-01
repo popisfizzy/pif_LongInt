@@ -2064,6 +2064,8 @@ pif_LongInt/UnsignedDouble
 
 	FindFirstSet()
 		// TODO
+	FindLastSet()
+		// TODO
 
 	/*
 	 * Comparison methods.

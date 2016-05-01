@@ -34,7 +34,7 @@
   2. Release Notes
   ----------------------------------------------------
 
-  Version b1.1.201604##.
+  Version b1.1.2016####.
 
     - Added Release Notes and To Do sections to pif_Arithmetic.
     - Added FirstFirstSet() and FindLastSet() methods.
@@ -397,9 +397,10 @@ If the format provided for a GAAF-specified method does not match one of the abo
 
 		      Note.
 
-		        This should have the same behavior as the following code for an object Integer.
+		        This should have the same behavior as the following code for an object Integer of some
+		        IntegerClass class that implements the pif_Arithmetic protocol.
 
-		          var/pif_BigInt/OriginalInt = new(Integer)
+		          var/IntegerClass/OriginalInt = new(Integer)
 		          for(var/i = 1, i <= N, i ++)
 		            Integer = Integer.Multiply(OriginalInt).
 
@@ -912,6 +913,16 @@ If the format provided for a GAAF-specified method does not match one of the abo
 		        *  0 is returned if the source object is equal to the argument data.
 		        * -1 is returned if the source object is less than the argument data.
 
+		      Note.
+
+		        This method is only guaranteed if (1) the input data is at most as long as the class
+		        it's being passed to and (2) the input data is of the same "sign behavior" as the
+		        class it's being passed to. For example, if the source object is of double-precision
+		        unsigned and the input data is single- or double-precision unsigned, then comparison
+		        is guaranteed to be accurate. But, comparing to triple-precision unsigned or single-
+		        precision signed is not guaranteed to be accurate. Specifically, these cases are
+		        considered undefined and left up to the implementation.
+
 			*/
 
 		EqualTo(...)
@@ -944,6 +955,14 @@ If the format provided for a GAAF-specified method does not match one of the abo
 		          !src.GreaterThan(Foo) && !src.LessThan(Foo)
 		           src.GreaterThanOrEqual(Foo) && src.LessThanOrEqual(Foo).
 
+		        This method is only guaranteed if (1) the input data is at most as long as the class
+		        it's being passed to and (2) the input data is of the same "sign behavior" as the
+		        class it's being passed to. For example, if the source object is of double-precision
+		        unsigned and the input data is single- or double-precision unsigned, then comparison
+		        is guaranteed to be accurate. But, comparing to triple-precision unsigned or single-
+		        precision signed is not guaranteed to be accurate. Specifically, these cases are
+		        considered undefined and left up to the implementation.
+
 			*/
 
 		NotEqualTo(...)
@@ -974,6 +993,14 @@ If the format provided for a GAAF-specified method does not match one of the abo
 		          !src.EqualTo(Foo)
 
 		           src.GreaterThan(Foo) || src.LessThan(Foo)
+
+		        This method is only guaranteed if (1) the input data is at most as long as the class
+		        it's being passed to and (2) the input data is of the same "sign behavior" as the
+		        class it's being passed to. For example, if the source object is of double-precision
+		        unsigned and the input data is single- or double-precision unsigned, then comparison
+		        is guaranteed to be accurate. But, comparing to triple-precision unsigned or single-
+		        precision signed is not guaranteed to be accurate. Specifically, these cases are
+		        considered undefined and left up to the implementation.
 
 			*/
 
@@ -1007,6 +1034,13 @@ If the format provided for a GAAF-specified method does not match one of the abo
 		           src.GreaterThan(Foo)
 		          !src.LessThanOrEqualTo(Foo)
 
+		        This method is only guaranteed if (1) the input data is at most as long as the class
+		        it's being passed to and (2) the input data is of the same "sign behavior" as the
+		        class it's being passed to. For example, if the source object is of double-precision
+		        unsigned and the input data is single- or double-precision unsigned, then comparison
+		        is guaranteed to be accurate. But, comparing to triple-precision unsigned or single-
+		        precision signed is not guaranteed to be accurate. Specifically, these cases are
+		        considered undefined and left up to the implementation.
 			*/
 
 		GreaterThanOrEqualTo(...)
@@ -1038,6 +1072,13 @@ If the format provided for a GAAF-specified method does not match one of the abo
 
 		           src.GreaterThanOrEqualTo(Foo)
 
+		        This method is only guaranteed if (1) the input data is at most as long as the class
+		        it's being passed to and (2) the input data is of the same "sign behavior" as the
+		        class it's being passed to. For example, if the source object is of double-precision
+		        unsigned and the input data is single- or double-precision unsigned, then comparison
+		        is guaranteed to be accurate. But, comparing to triple-precision unsigned or single-
+		        precision signed is not guaranteed to be accurate. Specifically, these cases are
+		        considered undefined and left up to the implementation.
 			*/
 
 		LessThan(...)
@@ -1070,6 +1111,13 @@ If the format provided for a GAAF-specified method does not match one of the abo
 		          !src.GreaterThanOrEqualTo(Foo)
 		           src.LessThan(Foo)
 
+		        This method is only guaranteed if (1) the input data is at most as long as the class
+		        it's being passed to and (2) the input data is of the same "sign behavior" as the
+		        class it's being passed to. For example, if the source object is of double-precision
+		        unsigned and the input data is single- or double-precision unsigned, then comparison
+		        is guaranteed to be accurate. But, comparing to triple-precision unsigned or single-
+		        precision signed is not guaranteed to be accurate. Specifically, these cases are
+		        considered undefined and left up to the implementation.
 			*/
 
 		LessThanOrEqualTo(...)
@@ -1101,6 +1149,13 @@ If the format provided for a GAAF-specified method does not match one of the abo
 
 		           src.LessThanOrEqualTo(Foo)
 
+		        This method is only guaranteed if (1) the input data is at most as long as the class
+		        it's being passed to and (2) the input data is of the same "sign behavior" as the
+		        class it's being passed to. For example, if the source object is of double-precision
+		        unsigned and the input data is single- or double-precision unsigned, then comparison
+		        is guaranteed to be accurate. But, comparing to triple-precision unsigned or single-
+		        precision signed is not guaranteed to be accurate. Specifically, these cases are
+		        considered undefined and left up to the implementation.
 			*/
 
 		// Alias methods.
