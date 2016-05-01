@@ -12,6 +12,10 @@
 
 #define	pliFLOOR(X) 			round(X) // This is the largest integer less than X.
 
+// Outputs a base 64-encoded value for inputs x such that 0 <= x < 64.
+#define	pliToBase64(x)			(((x) <= 25) ? ascii2text(65 + (x)) : (((x) <= 51) ? ascii2text(71 + (x)) : (((x) <= 61) ? "[(x)-52]" : (((x) == 62) ? "+" : "/"))))
+
+
 // These macros are used to make the behavior of the code in this library cleaner in its
 // presentation and clearer in its purpose. The clarity comes from two counts: the first is
 // that bit manipulation can often be a bit opaque and hard to follow, while the other is

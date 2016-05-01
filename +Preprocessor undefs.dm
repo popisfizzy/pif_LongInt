@@ -1,4 +1,5 @@
 #undef	pliFLOOR
+#undef	pliToBase64
 
 #undef	pliBYTE_ONE
 #undef	pliBYTE_TWO

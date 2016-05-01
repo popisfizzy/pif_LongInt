@@ -41,10 +41,12 @@ double precision integer is available.
 
     - Fixed several errors in computing remainders and quotients in division.
     - Added more documentation to functions.
-    - Made additions and modifications to the pif_Arithmetic protocol. Refer to
-      "pif_Arithmetic Protocol.dm" to see these changes.
+    - Made additions and modifications to the pif_Arithmetic protocol. Refer to "pif_Arithmetic
+      Protocol.dm" to see these changes.
     - Made rewrites to /UnsignedDouble.Remainder() and /UnsignedDouble.Divide(), significantly
-      increasing their speeed.
+      increasing their speeed. These modifications will "bubble" through to all other classes
+      in the library, so the rewrite is highly-significant.
+    - Implemented the SignedDouble class.
 
   Version b1.0.20160409.
 
@@ -60,6 +62,8 @@ double precision integer is available.
   - Write up complete documentation for the library.
   - Fully-implemented the SignedDouble class.
   - Implement classes for both signed and unsigned triple and quadruple-precision integers.
+  - Set up a preprocessor flag that toggles allowing negative remainders or having only positive
+    remainders. Currently, negative remainders are allowed to appear.
 
 ****************************************************************************************************
 ****************************************************************************************************/

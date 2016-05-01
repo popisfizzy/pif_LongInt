@@ -1,12 +1,14 @@
 /*
  * Implementation of an signed double precision (32-bit) integer that uses the
  * pif_Arithmetic protocol. Numbers are stored in two's complement form, and
- * thus have a precision between -2147483648 and 2147483647 (that is, between
- * 0x80000000 and 0x7FFFFFFF).
+ * thus have a precision between -2,147,483,648 (-2**31) and 2,147,483,647 (2**31-1).
+ * That is, between 0x80000000 and 0x7FFFFFFF in hexadecimal.
  */
 
 pif_LongInt/SignedDouble
 	parent_type = /pif_LongInt/UnsignedDouble
+
+	mode = OLD_OBJECT | NO_OVERFLOW_EXCEPTION | FIXED_PRECISION | SIGNED_MODE
 
 	Negate()
 		if(mode & NEW_OBJECT)
@@ -55,8 +57,18 @@ pif_LongInt/SignedDouble
 		. = ""
 
 		if(IsNegative())
-			Printer.Negate()
+			if((block_1 == 0x0000) && (block_2 == 0x8000))
+				// This special case has to be taken into account because 0x80000000 is
+				// the minimum for a signed double, and is outside the positive range.
+				// What happens is that when trying to negate it, you have ~0x80000000 + 1
+				// = 0x7FFFFFFF + 1 = 0x80000000 and thus get nowhere, breaking this
+				// method. This is the only value that could cause something like, though,
+				// so we only need to take special considerations for it and not any
+				// others.
 
+				return "-2147483648"
+
+			Printer.Negate()
 			negative = 1
 
 		while(Printer.IsNonZero())
@@ -73,15 +85,117 @@ pif_LongInt/SignedDouble
 		if(negative)
 			. = "-[.]"
 
+	Compare(pif_LongInt/Int)
+		// While the pif_Arithmetic protocol only requires a guarantee that comparisons against
+		// incoming data will work correctly for data of the same (or less) length and the same
+		// sign behavior, pif_LongInt will additionally guarantee that comparisons against other
+		// pif_LongInt objects will produce the correct result.
+
+		var
+			B1 // Least-significant.
+			B2 // Most-significant.
+
+		if(istype(Int))
+			// pif_LongInt objects are handled specially due to the aforementioned guarantee.
+
+			if(Int.Length() > Length)
+				// If the incoming object is larger than the source object, it will handle the
+				// comparison instead. The negative sign is because we're doing the opposite comparison
+				// by passing it off, so we have to reverse the sign to get back to the right one
+				// again. For example, if A = 10 and B = 9, A.Compare(B) will output 1 because A >B,
+				// but B.Compare(A) will output -1 because B < A. When they're equal, the result is 0
+				// and 0 = -0 so we don't need to worry.
+				return -Int.Compare(src)
+
+			B1 = Int._GetBlock(1) // It's always guaranteed to have at least one block.
+			B2 = (Int.Length() == 2) ? Int._GetBlock(2) : 0
+
+			if(!(Int.Mode() & SIGNED_MODE))
+				// If the incoming data is not in signed mode, then we need to first double-check
+				// whether the source data is negative or not. If it is negative, then automatically
+				// the source data is less than the input data, *but* if we proceed as usually it could
+				// on its face appear to be larger due to how two's complement works. E.g., if the input
+				// data is equal to 4,294,967,295 and the source data is equal to -1, then without checking
+				// the comparison would report htem equal because both have the same representation of
+				// 0xFFFFFFFF.
+
+				if(IsNegative())
+					return -1
+		else
+			var
+				list/Processed = _Process(args)
+
+			B1 = Processed[1]
+			B2 = Processed[2]
+
+		var
+			src_sign
+			input_sign
+
+		// These are true if negative and false if non-negative.
+		src_sign   = block_2 & 0x8000
+		input_sign = B2      & 0x8000
+
+		/*
+		 * Comparisons between data of different signs won't work as nicely as when
+		 * they have the same sign. Luckily, once we know the sign we can immediately
+		 * determine which is greater than and less than.
+		 */
+
+		if(!src_sign && input_sign)
+			// (src >= 0) and (input < 0)
+			return 1
+		else if(src_sign && !input_sign)
+			// (src < 0) and (input >= 0)
+			return -1
+
+		/*
+		 * If they do have the same sign, though, we can proceed like we did with the
+		 * parent method.
+		 */
+
+		. = block_2 - B2
+		if(. != 0)
+			return (. > 0) ? 1 : -1
+
+		. = block_1 - B1
+		return (. == 0) ? 0 : ( (. > 0) ? 1 : -1 )
+
+	SetMode(_m)
+		// Make sure that FIXED_PRECISION and SIGNED_MODE are both always on.
+		mode = _m | (SIGNED_MODE | FIXED_PRECISION)
+
+		return mode
+
+	SetModeFlag(flag, state)
+		if(state)
+			mode |= flag
+		else
+			mode &= ~flag
+
+		// Make sure that FIXED_PRECISION is always on and SIGNED_MODE are both always on.
+		mode = mode | (SIGNED_MODE | FIXED_PRECISION)
+
+		return mode
+
+	Maximum()
+		//  2,147,483,647 =  2**31 - 1.
+		return new /pif_LongInt/SignedDouble(0x7FFF, 0xFFFF)
+	Minimum()
+		// -2,147,483,648 = -2**31
+		return new /pif_LongInt/SignedDouble(0x8000, 0x0000)
+	Zero()
+		return new /pif_LongInt/SignedDouble(0x0000, 0x0000)
+
 /*
 
-Let D(x,y) -> (q,r) <=> y*q + r = x. Then we have the following where + denotes some positive number
-and - denotes some negative number:
+Let D(x,y) = (q,r) iff y*q + r = x. Then we have the following where "+" denotes some positive number
+and "-" denotes some negative number:
 
-	- D(+,+) -> (+,+)
-	- D(+,-) -> (-,+)
-	- D(-,+) -> (-,-)
-	- D(-,-) -> (+,-)
+  * D(+,+) -> (+,+)
+  * D(+,-) -> (-,+)
+  * D(-,+) -> (-,-)
+  * D(-,-) -> (+,-)
 
 That is, if Q(x,y) is the quotient of x and y, and if R(x,y) is the remainder of x and y, and
 if the relationship y*Q(x,y) + R(x,y) = x holds for all integers x, y, then we have the
@@ -111,10 +225,19 @@ equal:
 
 As an illustrating example,
 
-  - D( 40, 3) -> ( 13, 1) because  3*( 13) + 1 =  40.
-  - D( 40,-3) -> (-13, 1) because -3*(-13) + 1 =  40.
-  - D(-40, 3) -> (-13,-1) because  3*(-13) - 1 = -40.
-  - D(-40,-3) -> ( 13,-1) because -3*( 13) - 1 = -40.
+  * D( 40, 3) -> ( 13, 1) because  3*( 13) + 1 =  40.
+  * D( 40,-3) -> (-13, 1) because -3*(-13) + 1 =  40.
+  * D(-40, 3) -> (-13,-1) because  3*(-13) - 1 = -40.
+  * D(-40,-3) -> ( 13,-1) because -3*( 13) - 1 = -40.
+
+This has the bonus that the following four are also equal,
+
+   R( x, y)
+  -R(-x, y)
+   R( x,-y)
+  -R(-x,-y)
+
+though the downside that remainders may be negative.
 
 */
 
@@ -324,7 +447,7 @@ As an illustrating example,
 
 		switch(D[11]) // switch(M)
 			// We have the following to keep in mind:
-			//	* D[ 6] = src0
+			//  * D[ 6] = src0
 			//  * D[ 7] = src1
 			//  * D[ 8] = src2
 			//  * D[ 9] = src3
@@ -545,7 +668,7 @@ As an illustrating example,
 
 		switch(D[11]) // switch(M)
 			// We have the following to keep in mind:
-			//	* D[ 6] = src0
+			//  * D[ 6] = src0
 			//  * D[ 7] = src1
 			//  * D[ 8] = src2
 			//  * D[ 9] = src3
@@ -661,10 +784,3 @@ As an illustrating example,
 			Quot,
 			Rem
 		)
-
-	Maximum()
-		// 2147483647
-		return new /pif_LongInt/SignedDouble(0x7FFF, 0xFFFF)
-	Minimum()
-		// -2147483648
-		return new /pif_LongInt/SignedDouble(0x8000, 0x0000)

@@ -1,7 +1,8 @@
 /*
  * Implementation of an unsigned double precision (32-bit) integer that uses the
  * pif_Arithmetic protocol (inherited from the /pif_LongInt superclass). It can
- * accurately store numbers between 0 and 4294967295 (between 0x0000 and 0xFFFF).
+ * accurately store numbers between 0 and 4,294,967,295 (2**32 - 1)
+ * (between 0x00000000 and 0xFFFFFFFF).
  */
 
 pif_LongInt/UnsignedDouble
@@ -14,6 +15,8 @@ pif_LongInt/UnsignedDouble
 		block_2 = 0 // Most-significant block.
 
 		const/Length = 2
+
+	mode = OLD_OBJECT | NO_OVERFLOW_EXCEPTION | FIXED_PRECISION | UNSIGNED_MODE
 
 	/*
 	 * Constructor.
@@ -2071,18 +2074,55 @@ pif_LongInt/UnsignedDouble
 	 * Comparison methods.
 	 */
 
-	Compare(...)
+	Compare(pif_LongInt/Int)
+		// While the pif_Arithmetic protocol only requires a guarantee that comparisons against
+		// incoming data will work correctly for data of the same (or less) length and the same
+		// sign behavior, pif_LongInt will additionally guarantee that comparisons against other
+		// pif_LongInt objects will produce the correct result.
+
 		var
-			list/Processed = _Process(args)
+			B1 // Least-significant.
+			B2 // Most-significant.
 
-			b1 = Processed[1]
-			b2 = Processed[2]
+		if(istype(Int))
+			// pif_LongInt objects are handled specially due to the aforementioned guarantee.
 
-		. = src.block_2 - b2
+			if(Int.Length() > Length)
+				// If the incoming object is larger than the source object, it will handle the
+				// comparison instead. The negative sign is because we're doing the opposite comparison
+				// by passing it off, so we have to reverse the sign to get back to the right one
+				// again. For example, if A = 10 and B = 9, A.Compare(B) will output 1 because A >B,
+				// but B.Compare(A) will output -1 because B < A. When they're equal, the result is 0
+				// and 0 = -0 so we don't need to worry.
+				return -Int.Compare(src)
+
+			B1 = Int._GetBlock(1) // It's always guaranteed to have at least one block.
+			B2 = (Int.Length() == 2) ? Int._GetBlock(2) : 0
+
+			if(Int.Mode() & SIGNED_MODE)
+				// If it's in signed mode then we have to double-check first whether it's positive or
+				// negative. If it's negative, then automatically the source object (being unsigned)
+				// will be greater, *but* there could be an issue where it would appear to be less than
+				// or equal to the incoming data. E.g., if the source object is equal to 4,294,967,295
+				// and the incoming (signed) object is -1, then without checking the comparison would
+				// report them being equal because both have the same representation of 0xFFFFFFFF.
+
+				if(B2 & 0x8000)
+					// If the largest bit of the most-significant block is on, then the incoming data is
+					// negative therefore clearly less than the source data..
+					return 1
+
+		else
+			var/list/Processed = _Process(args)
+
+			B1 = Processed[1]
+			B2 = Processed[2]
+
+		. = block_2 - B2
 		if(. != 0)
 			return (. > 0) ? 1 : -1
 
-		. = src.block_1 - b1
+		. = block_1 - B1
 		return (. == 0) ? 0 : ( (. > 1) ? 1 : -1)
 
 	EqualTo(...)
@@ -2221,17 +2261,15 @@ pif_LongInt/UnsignedDouble
 		return b2 + b1
 
 	PrintBase64()
-#define	ToBase64(x)	(((x) <= 25) ? ascii2text(65 + (x)) : (((x) <= 51) ? ascii2text(71 + (x)) : (((x) <= 61) ? "[(x)-52]" : (((x) == 62) ? "+" : "/"))))
 		var
 			b1 = ""
 			b2 = ""
 
 		for(var/i = 0, i < 3, i ++)
-			b1 = ToBase64((block_1 >> (5*i    )) & 0x001F) + b1
-			b2 = ToBase64((block_2 >> (5*i + 4)) & 0x001F) + b2
+			b1 = pliToBase64((block_1 >> (5*i    )) & 0x001F) + b1
+			b2 = pliToBase64((block_2 >> (5*i + 4)) & 0x001F) + b2
 
-		return b2 + ToBase64(((block_2 & 0x000F) << 1) | (block_1 >> 15)) + b1
-#undef	ToBase64
+		return b2 + pliToBase64(((block_2 & 0x000F) << 1) | (block_1 >> 15)) + b1
 
 	// Alias methods.
 
@@ -2292,4 +2330,6 @@ pif_LongInt/UnsignedDouble
 	Maximum()
 		return new /pif_LongInt/UnsignedDouble(0xFFFF, 0xFFFF)
 	Minimum()
+		return new /pif_LongInt/UnsignedDouble(0x0000, 0x0000)
+	Zero()
 		return new /pif_LongInt/UnsignedDouble(0x0000, 0x0000)

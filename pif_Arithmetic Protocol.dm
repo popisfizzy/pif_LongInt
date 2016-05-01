@@ -43,6 +43,11 @@
     - Added notes about the relationship between Quotient() and Remainder().
     - Added note about the legal output values of Remainder().
     - Added a note about restrictions on the output of Divide().
+    - Added notes on how the comparison methods should handle incoming data when it is "distinct"
+      from the source object. Refer to those methods for details.
+    - Added a note on the behavior of Negate() for signed integer objects, and more specifically for
+      the largest negative number representable for a fixed-width signed integer.
+    - Added the Zero() "static" method.
 
   Version b1.0.20160409.
 
@@ -524,6 +529,13 @@ If the format provided for a GAAF-specified method does not match one of the abo
 		        If SIGNED_MODE is set, then this should have the same behavior as calling
 		        src.Multiply(-1). If SIGNED_MODE is not set, its behavior is undefined and
 		        implementation-specific.
+
+		        If SIGNED_MODE is set, then the behavior of this method is undefined for the object
+		        returned by Minimum(). This is because, in two's complement notation, the largest
+		        negative number can not be converted to positive without a loss of precision. Two
+		        reasonable behaviors are to return 0 (an object equivalent to that output by the
+		        Zero() method) or return an object equal to the original object (an object equivalent
+		        to that output by the Minimum() method).
 
 			*/
 
@@ -1584,7 +1596,7 @@ If the format provided for a GAAF-specified method does not match one of the abo
 			  Behavior.
 
 			    This outputs an object of the same type as the local method class which is the
-                "highest" integer that can be stored on N blocks. By "highest", this is an object
+                "maximum" integer that can be stored on N blocks. By "maximum", this is an object
                 such that if it were incremented it would overflow; equivalently, one can imagine it
                 as the largest positive integer represented given the width of the object.
 
@@ -1614,7 +1626,7 @@ If the format provided for a GAAF-specified method does not match one of the abo
 			  Behavior.
 
 			    This outputs an object of the same type as the local method class which is the
-                "lowest" integer that can be stored on N blocks. By "lowest", this is an object such
+                "minimum" integer that can be stored on N blocks. By "minimum", this is an object such
                 that if it were decrement it would overflow; equivalently, one can imagine it as the
                 largest (in absolute value) non-positive integer represented given the width of the
                 object.
@@ -1630,6 +1642,25 @@ If the format provided for a GAAF-specified method does not match one of the abo
 
 			    If the SIGNED_MODE flag is not set, this method will always output an object equal
                 to 0. That is, an object O such that O.IsZero() is true.
+
+			*/
+
+		Zero()
+			/*
+
+			Outputs an object equal to zero.
+
+			Arguments.
+
+			  None.
+
+			Behavior.
+
+			  Returns an object equal to zero. That is, for the output object, IsZero() is true.
+
+			Returns.
+
+			  An object of the same type as the local method class.
 
 			*/
 
