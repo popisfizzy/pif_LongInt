@@ -420,9 +420,14 @@ pif_LongInt/SignedDouble
 
 							Tracker = new src.type // Tracks the final value.
 
-						length = length(String)
+						delta = 0 // Basically the amount of prefix characters there are.
+						length
 
 						const/ASCII_ZERO = 48
+
+						negate_flag = findtext(String, "-", 1, 2)
+					delta = negate_flag ? (delta+1) : delta
+					length = length(String) - delta
 
 					PositionTracker.SetModeFlag(OVERFLOW_EXCEPTION, mode & OVERFLOW_EXCEPTION)
 					PositionTracker.SetModeFlag(NEW_OBJECT, 0)
@@ -435,7 +440,7 @@ pif_LongInt/SignedDouble
 						// can get the least-significant characters first. This is largely because
 						// it makes the math a bit easier.
 
-						var/c = text2ascii(String, i) - ASCII_ZERO
+						var/c = text2ascii(String, i+delta) - ASCII_ZERO
 
 						if((c < 0) || (c > 9))
 							// If we've encountered an invalid character, throw an exception.
@@ -453,6 +458,9 @@ pif_LongInt/SignedDouble
 							Tracker.Add(Buffer.Multiply(PositionTracker))
 
 						PositionTracker.Multiply(10)
+
+					if(negate_flag)
+						Tracker.Negate()
 
 					Data[1] = Tracker._GetBlock(1)
 					Data[2] = Tracker._GetBlock(2)
