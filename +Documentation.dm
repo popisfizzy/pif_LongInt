@@ -39,7 +39,8 @@ double precision integer is available.
 
   Version b1.1.2016####.
 
-    - Fixed several errors in computing remainders and quotients in division.
+    - Fixed several errors in computing remainders and quotients in division in the UnsignedDouble
+      class.
     - Added more documentation to functions.
     - Made additions and modifications to the pif_Arithmetic protocol. Refer to "pif_Arithmetic
       Protocol.dm" to see these changes.
@@ -47,6 +48,9 @@ double precision integer is available.
       increasing their speeed. These modifications will "bubble" through to all other classes
       in the library, so the rewrite is highly-significant.
     - Implemented the SignedDouble class.
+    - Fixed an oversight in Quotient() and Divide() that could sometimes result in the second block
+      of a SignedDouble or UnsignedDouble from being overwritten when the object was not in
+      NEW_OBJECT mode.
 
   Version b1.0.20160409.
 

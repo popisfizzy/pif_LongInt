@@ -1272,9 +1272,11 @@ pif_LongInt/UnsignedDouble
 			//  * D[5] = q4
 
 			if(1)
-				Quot._SetBlock(1, D[2]                          )
+				Quot._SetBlock(2, 0                                )
+				Quot._SetBlock(1, D[2]                             )
 
 			if(2)
+				Quot._SetBlock(2, 0                                )
 				Quot._SetBlock(1, D[3] | pliBYTE_ONE_SHIFTED(D[2]) )
 
 			if(3)
@@ -1443,9 +1445,11 @@ pif_LongInt/UnsignedDouble
 			//  * D[5] = q4
 
 			if(1)
-				Quot._SetBlock(1, D[2]                          )
+				Quot._SetBlock(2, 0                                )
+				Quot._SetBlock(1, D[2]                             )
 
 			if(2)
+				Quot._SetBlock(2, 0                                )
 				Quot._SetBlock(1, D[3] | pliBYTE_ONE_SHIFTED(D[2]) )
 
 			if(3)
@@ -2328,8 +2332,11 @@ pif_LongInt/UnsignedDouble
 	 */
 
 	Maximum()
+		// 4,294,967,295 = 2**32 - 1
 		return new /pif_LongInt/UnsignedDouble(0xFFFF, 0xFFFF)
 	Minimum()
+		// 0.
 		return new /pif_LongInt/UnsignedDouble(0x0000, 0x0000)
+
 	Zero()
 		return new /pif_LongInt/UnsignedDouble(0x0000, 0x0000)

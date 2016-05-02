@@ -11,6 +11,10 @@ pif_LongInt/SignedDouble
 	mode = OLD_OBJECT | NO_OVERFLOW_EXCEPTION | FIXED_PRECISION | SIGNED_MODE
 
 	Negate()
+		// Note that if A = 0x80000000, then A.Negate() == A. This is allowed by
+		// the pif_Arithmetic protocol, and is basically a drawback of using two's
+		// complement.
+
 		if(mode & NEW_OBJECT)
 			var/pif_LongInt/SignedDouble/Int = new src.type(src)
 			Int.SetModeFlag(NEW_OBJECT, 0)
@@ -184,6 +188,7 @@ pif_LongInt/SignedDouble
 	Minimum()
 		// -2,147,483,648 = -2**31
 		return new /pif_LongInt/SignedDouble(0x8000, 0x0000)
+
 	Zero()
 		return new /pif_LongInt/SignedDouble(0x0000, 0x0000)
 
@@ -328,9 +333,11 @@ though the downside that remainders may be negative.
 
 			if(1)
 				Quot._SetBlock(1, D[2]                             )
+				Quot._SetBlock(2, 0                                )
 
 			if(2)
 				Quot._SetBlock(1, D[3] | pliBYTE_ONE_SHIFTED(D[2]) )
+				Quot._SetBlock(2, 0                                )
 
 			if(3)
 				Quot._SetBlock(2, D[2])
@@ -643,9 +650,11 @@ though the downside that remainders may be negative.
 			//  * D[5] = q4
 
 			if(1)
+				Quot._SetBlock(2, 0                                )
 				Quot._SetBlock(1, D[2]                             )
 
 			if(2)
+				Quot._SetBlock(2, 0                                )
 				Quot._SetBlock(1, D[3] | pliBYTE_ONE_SHIFTED(D[2]) )
 
 			if(3)
