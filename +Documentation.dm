@@ -1,7 +1,7 @@
 /**
  ** pif_LongInt
- **   Version: b1.1.2016####
- **   Release Date: Month ##, 2016
+ **   Version: b1.1.20160502
+ **   Release Date: May 2, 2016
  **
  ***************************************************************************************************
  ***************************************************************************************************
@@ -37,7 +37,7 @@ double precision integer is available.
   3. Release Notes
   ----------------------------------------------------
 
-  Version b1.1.2016####.
+  Version b1.1.20160502.
 
     - Fixed several errors in computing remainders and quotients in division in the UnsignedDouble
       class.

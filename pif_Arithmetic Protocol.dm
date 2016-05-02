@@ -10,8 +10,8 @@
 
 /**
  ** pif_Arithmetic
- **   Version: b1.1.2016####
- **   Release Date: Month ##, 2016
+ **   Version: b1.1.20160502
+ **   Release Date: May 5, 2016
  **
  ***************************************************************************************************
  ***************************************************************************************************
@@ -34,7 +34,7 @@
   2. Release Notes
   ----------------------------------------------------
 
-  Version b1.1.2016####.
+  Version b1.1.20160502.
 
     - Added Release Notes and To Do sections to pif_Arithmetic.
     - Added FirstFirstSet() and FindLastSet() methods.
@@ -48,6 +48,12 @@
     - Added a note on the behavior of Negate() for signed integer objects, and more specifically for
       the largest negative number representable for a fixed-width signed integer.
     - Added the Zero() "static" method.
+    - Added a /pif_Arithmetic/ProtocolNonConformingObjectException exception as well as a note on
+      where to use it in the GAAF format.
+    - Added a /pif_Arithmetic/NonNumericInvalidPositionException exception as well as a note on
+      where to use it in the GAAF format.
+    - Updated the GAAF format to provide more details on how a list of integers should be
+      interpreted, and especially a list of one integer.
 
   Version b1.0.20160409.
 
@@ -119,32 +125,42 @@ They are as follows.
            directly from this object. Ways of handling if pAr_object is too large for the source
            object to process are implementation-specific.
 
+           If pAr_Object does not appear to implement the pif_Arithmetic protocol (e.g., by not
+           having a necessary method) throw a /pif_Arithmetic/ProtocolNonConformingObjectException
+           exception.
+
   3.  proc/Method(list/List)
 
       i.   List is a /list object that is interpreted as left-significant. That is, the left-most
-           entry ("block") is the most-significant element of the list, while the right-most entry
-           is the least-significant element. This is so that something of the form
+           entry ("block") of the list (the entry with the lowest index) is interpreted as the
+           most-significant element of that list, while the right-most block (the entry with the
+           highest index) is interpreted as the most-significant element of that list. This is so
+           that something of the form
 
-             Method(0x1234, 0x5678)
+             Method(0x6789, 0xABCD)
 
-           will be interpreted as the number 0x12345678. If it were a right-significant list, this
-           would instead be interpreted as 0x56781234.
+           is interpreted as the number 0x6789ABCD, which is intuitive. If the list were interpreted
+           as right-significant, this would instead be the number 0xABCD6789.
 
-           All elements should be integers. If a non-integer is found, a /pif_Arithmetic/NonIntegerException
-           exception is thrown.
+           All elements of the list should be integers. If a non-integer is found in the list, then
+           a /pif_Arithmetic/NonIntegerException exception should be thrown. If a non-numeric value is
+           found then a /pif_Arithmetic/NonNumericInvalidPositionException exception should be thrown.
 
-           Only the most-significant element should be negative. If a negative is found elsewhere,
-           it may be dealt with in one of two ways.
+           If a list contains only one element, then,
 
-             a. A /pif_Arithmetic/NegativeInvalidPositionException exception is thrown.
-             b. It is treated as a raw bitstring and interpreted accordingly.
+             a. If SIGNED_MODE is enabled, integers in the range [-16777215, 16777215] must be
+                supported.
+             b. If SIGNED_MODE is not enabled, then integers in the range [0, 16777215] must be
+                supported. If a negative value is found, then either it should be treated as a raw
+                bitstring or a /pif_Arithmetic/NegativeInvalidPositionException exception should be
+                thrown.
 
-           If the source object is not in SIGNED_MODE (ie.. it is an unsiged integer) and a negative
-           integer is found in the most-significant block then it may be dealt with in one of two
-           ways.
+           Interpretation of integers with an absolute value larger than 16777215 is undefined and
+           left to the implementation.
 
-             a. A /pif_Arithmetic/NegativeInUnsignedIntegerException exception is thrown.
-             b. It is treated as a raw bitstring and interpreted accordingly.
+           If the list contains more than one element, then the resulting data should be treated as
+           raw binary data by performing bitwise AND with the data and the value 0xFFFF. There should
+           be no regard for sign data or floating point values.
 
   4.  proc/Method(String)
 
@@ -166,6 +182,11 @@ They are as follows.
               (binary) number using the characters in teh set {"0", "1"} using their standard binary
               interpretation. If a character other than these is found beyond the prefix, then a
               /pif_Arithmetic/InvalidStringEncodingException exception is thrown.
+
+           To indicate a negative number, a negative sign appears before the prefix for binary and
+           hexadecmal number (e.g., "-0b1010" or "-0x1234") and as usual for decimal numbers (e.g.,
+           "-150"). If a negative sign is found in a number with SIGNED_MODE disabled, then a
+           /pif_Arithmetic/NegativeInvalidPositionException exception is thrown.
 
            If an invalid prefix specifically is found, then a /pif_Arithmetic/InvalidStringPrefixException
            exception is thrown. If String is a zero-length string (i.e., "") then a
@@ -210,8 +231,11 @@ They are as follows.
 
            A left-significant list of integer arguments. See 3. for details on this format.
 
-If the format provided for a GAAF-specified method does not match one of the above formats, then a
-/pif_Arithmetic/InvalidArgumentFormatException exception is thrown.
+If the format provided as the arguments to a GAAF_specified method do not match one of the above
+formats (and this can be determined) then a /pif_Arithmetic/InvalidArgumentFormatException exception
+should be thrown. In practice, this may be difficult to determine because Format 7. provides a "catch
+all" for when others are not matched, and typically the exceptions provided in Format 3. would be of
+more use than the /pif_Arithmetic/InvalidArgumentFormatException exception.
 
 */
 
@@ -1868,5 +1892,25 @@ If the format provided for a GAAF-specified method does not match one of the abo
 
 		name = "Out of Bounds Exception"
 		desc = "Block request is out of bounds."
+
+	ProtocolNonConformingObjectException
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
+		parent_type = /pif_Arithmetic/GenericArithmeticException
+#else
+		parent_type = /Arithmetic/GenericArithmeticException
+#endif
+
+		name = "Protocol Non-Conforming Object Exception"
+		desc = "Passed object does not conform to the pif_Arithmetic protocol."
+
+	NonNumericInvalidPositionException
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
+		parent_type = /pif_Arithmetic/GenericArithmeticException
+#else
+		parent_type = /Arithmetic/GenericArithmeticException
+#endif
+
+		name = "Non-Numeric Data In Invalid Position Exception"
+		desc = "Non-numeric data was passed in an invalid position."
 
 #endif

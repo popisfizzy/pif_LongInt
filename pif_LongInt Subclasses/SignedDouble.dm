@@ -10,6 +10,611 @@ pif_LongInt/SignedDouble
 
 	mode = OLD_OBJECT | NO_OVERFLOW_EXCEPTION | FIXED_PRECISION | SIGNED_MODE
 
+	_Process(list/arguments)
+		// Does the processing for GAAF_format arguments. I'd really prefer this
+		// be broken up into a number of subroutines, but I think the impact on
+		// performance will be too significant. If static methods become available
+		// in DM, I'll probably break this up and then implement methods like
+		// /pif_LongInt/FromString() or /pif_LongInt/FromIntegers() so that I can
+		// avoid a performance hit.
+
+		var/list/Data = new
+		Data.len = Length // Note that Data[0] is less-significant and Data[1] is
+						  // more-significant.
+
+		/*
+
+		  1.  proc/Method() or proc/Method(null)
+
+		    This is a special case that should be interpreted as passing 0.
+
+		*/
+
+		if(arguments.len == 0)
+			Data[1] = 0
+			Data[2] = 0
+
+		if(arguments.len == 1)
+
+
+			if(isnull(arguments[1]))
+				Data[1] = 0
+				Data[2] = 1
+
+		/*
+
+		  2.  proc/Method(datum/pAr_Object)
+
+		      i.   pAr_Object is an object that implements the pif_Arithmetic protocol, and data is pulled
+		           directly from this object. Ways of handling if pAr_object is too large for the source
+		           object to process are implementation-specific.
+
+		           If pAr_Object does not appear to implement the pif_Arithmetic protocol (e.g., by not
+		           having a necessary method) throw a /pif_Arithmetic/ProtocolNonConformingObjectException
+		           exception.
+		*/
+
+			else if(istype(arguments[1], /pif_LongInt))
+				// If it's a pif_LongInt object, we can be a little more sure that we're dealing with an object
+				// that implements the pif_Arithmetic protocol.
+
+				var/pif_LongInt/IntegerObject = arguments[1]
+
+				if((IntegerObject.Length() > Length) && (mode & OVERFLOW_EXCEPTION))
+					var/L = IntegerObject.Length()
+					for(var/i = 3, i <= L, i ++)
+						// We'll look at the other data in the object. If we find any non-zero data, then the
+						// object is too large to read in and we must throw an exception.
+						if(IntegerObject._GetBlock(i) != 0)
+							throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+				else
+					// Otherwise, just assign the relevant data to the list.
+					Data[1] = IntegerObject._GetBlock(1)
+					Data[2] = IntegerObject._GetBlock(2)
+
+			else if(istype(arguments[1], /datum))
+				// If it's some other type of object, we'll assume it's something that implements the pif_Arithmetic
+				// protocol.
+
+				var/pif_Arithmetic/pif_ArithmeticObject = arguments[1]
+
+				if(!hascall(pif_ArithmeticObject, "Length") || !hascall(pif_ArithmeticObject, "_GetBlock"))
+					// If it doesn't conform to the pif_Arithmetic protocol, we throw the required exception.
+					throw new /pif_Arithmetic/ProtocolNonConformingObjectException(__FILE__, __LINE__)
+
+				// Otherwise, we do the same as above.
+
+				if((pif_ArithmeticObject.Length() > Length) && (mode & OVERFLOW_EXCEPTION))
+					// Same as above with the /pif_LongInt object: if we find any non-zero data beyond block two,
+					// then the object is too large to read in.
+					var/L = pif_ArithmeticObject.Length()
+					for(var/i = 3, i <= L, i ++)
+						if(pif_ArithmeticObject._GetBlock(i) != 0)
+							throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+				else
+					Data[1] = pif_ArithmeticObject._GetBlock(1)
+					Data[2] = pif_ArithmeticObject._GetBlock(2)
+
+		/*
+
+		3.  proc/Method(list/List)
+
+		  i.   List is a /list object that is interpreted as left-significant. That is, the left-most
+		       entry ("block") of the list (the entry with the lowest index) is interpreted as the
+		       most-significant element of that list, while the right-most block (the entry with the
+		       highest index) is interpreted as the most-significant element of that list. This is so
+		       that something of the form
+
+		         Method(0x6789, 0xABCD)
+
+		       is interpreted as the number 0x6789ABCD, which is intuitive. If the list were interpreted
+		       as right-significant, this would instead be the number 0xABCD6789.
+
+		       All elements of the list should be integers. If a non-integer is found in the list, then
+		       a /pif_Arithmetic/NonIntegerException exception should be thrown. If a non-numeric value is
+		       found then a /pif_Arithmetic/NonNumericInvalidPositionException exception should be thrown.
+
+		       If a list contains only one element, then,
+
+		         a. If SIGNED_MODE is enabled, integers in the range [-16777215, 16777215] must be
+		            supported.
+		         b. If SIGNED_MODE is not enabled, then integers in the range [0, 16777215] must be
+		            supported. If a negative value is found, then either it should be treated as a raw
+		            bitstring or a /pif_Arithmetic/NegativeInvalidPositionException exception should be
+		            thrown.
+
+		       Interpretation of integers with an absolute value larger than 16777215 is undefined and
+		       left to the implementation.
+
+		       If the list contains more than one element, then the resulting data should be treated as
+		       raw binary data by performing bitwise AND with the data and the value 0xFFFF. There should
+		       be no regard for sign data or floating point values.
+
+		*/
+
+			else if(istype(arguments[1], /list))
+				var/list/Args = arguments[1]
+
+				if(Args.len == 1)
+					// When passing a single integer argument, we allow a larger block than usual.
+
+					var
+						Integer = Args[1]
+
+						block_1
+						block_2
+
+						negate_flag = 0
+
+					if(!isnum(Integer))
+						throw new /pif_Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+					else if(round(Integer) != Integer)
+						// Must be an integer.
+						throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+
+					if(Integer < 0)
+						// If it's less than zero, we negate Integer and mark the data as needing negated
+						// back at the end.
+
+						Integer = -Integer
+						negate_flag = 1
+
+					// Any other value we'll interpret as an integer. Only values in the range [0,
+					// 16777215] are guaranteed to be accurate; above that range, it may not be
+					// accurate and either strings or lists of two elements should be used.
+
+					block_1 = Integer % 65536
+					block_2 = (Integer - block_1) / 65536
+
+					if(negate_flag)
+						block_1 = ~block_1
+						block_2 = ~block_2
+
+						var
+							byte1 = pliBYTE_ONE(block_1) // Least significant.
+							byte2 = pliBYTE_TWO(block_1)
+							byte3 = pliBYTE_ONE(block_2)
+							byte4 = pliBYTE_TWO(block_2) // Most significant.
+
+						byte1 ++
+						pliADDBUFFER(byte1, byte2)
+						pliADDBUFFER(byte2, byte3)
+						pliADDBUFFER(byte3, byte4)
+
+						block_1 = byte1 | pliBYTE_ONE_SHIFTED(byte2)
+						block_2 = byte3 | pliBYTE_ONE_SHIFTED(byte4)
+
+					Data[1] = block_1
+					Data[2] = block_2
+
+				else
+					// Lists of two elements are simply interpreted as bitstrings provided they
+					// are integer values.
+
+					var
+						block_1 = arguments[arguments.len  ]
+						block_2 = arguments[arguments.len-1]
+
+					if(!isnum(block_1) || !isnum(block_2))
+						throw new /pif_Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+					else if( (round(block_1) != block_1) || (round(block_2) != block_2) )
+						throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+
+					// Because this class is unsigned, we will interpret negative values as bitstrings.
+					if(block_1 < 0)
+						block_1 &= 0xFFFF
+					if(block_2 < 0)
+						block_2 &= 0xFFFF
+
+					Data[1] = block_1
+					Data[2] = block_2
+
+					for(var/i = 1, i <= Args.len-2, i ++)
+						// Now we look through the rest of the arguments to make sure they don't violate
+						// any requirements of the GAAF format.
+
+						var/block = Args[i]
+
+						if(!isnum(block))
+							throw new /pif_Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+						else if(round(block) != block)
+							throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+						else if((mode & OVERFLOW_EXCEPTION) && (block != 0))
+							// If there is non-zero data and OVERFLOW_EXCEPTION mode is enabled, then the
+							// incoming data is too large to read in and we must throw the exception.
+							throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+		/*
+
+		4.  proc/Method(String)
+
+		  i.   String is a string with the following requirement.
+
+		       a. If unprefixed (e.g., "12345") the string is interpreted as a base ten (decimal) number
+		          using the characters in the set {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+		          with their standard decimal interpretation. If a character other than these is found,
+		          then a /pif_Arithmetic/InvalidStringEncodingException exception is thrown.
+
+		       b. If previxed with "0x" (e.g., "0x1234") the string is interpreted as a base sixteen
+		          (hexadecimal) number using the characters in the set {"0", "1", "2", "3", "4", "5",
+		          "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "a", "b", "c", "d", "e", "f"}, using
+		          their standard hexadecimal interpretation; furthermore, mixed case (i.e., both upper
+		          and lower case) is allowed. If a character other than these is found beyond the
+		          prefix, then a /pif_Arithmetic/InvalidStringEncodingException exception is thrown.
+
+		       c. If prefixed with "0b" (e.g., "0b1010") the string is interpreted as a base two
+		          (binary) number using the characters in teh set {"0", "1"} using their standard binary
+		          interpretation. If a character other than these is found beyond the prefix, then a
+		          /pif_Arithmetic/InvalidStringEncodingException exception is thrown.
+
+	           To indicate a negative number, a negative sign appears before the prefix for binary and
+	           hexadecmal number (e.g., "-0b1010" or "-0x1234") and as usual for decimal numbers (e.g.,
+	           "-150"). If a negative sign is found in a number with SIGNED_MODE disabled, then a
+	           /pif_Arithmetic/NegativeInvalidPositionException exception is thrown.
+
+		       If an invalid prefix specifically is found, then a /pif_Arithmetic/InvalidStringPrefixException
+		       exception is thrown. If String is a zero-length string (i.e., "") then a
+		       /pif_Arithmetic/InvalidStringArgumentException exception is thrown.
+
+		*/
+
+			else if(istext(arguments[1]))
+				var/String = arguments[1]
+
+				if(length(String) == 0)
+					// Zero-length strings are not allowed.
+					throw new /pif_Arithmetic/InvalidStringArgumentException(__FILE__, __LINE__)
+
+				else if(findtextEx(String, "0b", 1, 3) || findtextEx(String, "-0b", 1, 4))
+					/*
+					 * We have a string with a binary-encoded number.
+					 */
+
+					var
+						pif_LongInt/SignedDouble/Tracker = new src.type
+
+						delta = 2 // Basically the amount of prefix characters there are.
+						length
+
+						const/ASCII_ZERO = 48
+
+						negate_flag = findtext(String, "-", 1, 2)
+					delta = negate_flag ? (delta+1) : delta
+					length = length(String) - delta
+
+					Tracker.SetModeFlag(NEW_OBJECT, 0)
+
+					for(var/i = length, i > 0, i --)
+						// This loop starts from the *end* of the string and moves forward, so we
+						// can get the least-significant characters first. This is largely because
+						// it makes the math a bit easier.
+
+						var/c = text2ascii(String, i+delta) - ASCII_ZERO
+
+						if( (c != 0) && (c != 1) )
+							// If we've encountered an invalid character, throw an exception.
+							throw new /pif_Arithmetic/InvalidStringEncodingException(__FILE__, __LINE__)
+
+						if((length - i) < 16)
+							Tracker.Add(0x0000, c << (length - i))
+						else if((length - i) < 32)
+							Tracker.Add(c << ((length - i) - 16), 0x0000)
+						else
+							if(!(mode & OVERFLOW_EXCEPTION))
+								// If we're at a point larger than can
+								// be stored in a double precision integer,
+								// and if we're aren't tracking for overflow,
+								// then just stop the loop.
+								break
+
+							else if(c != 0)
+								// Otherwise, wait until we find a non-zero
+								// term and throw the exception.
+								throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+					if(negate_flag)
+						Tracker.Negate()
+
+					Data[1] = Tracker._GetBlock(1)
+					Data[2] = Tracker._GetBlock(2)
+
+				else if(findtextEx(String, "0x", 1, 3) || findtextEx(String, "-0x", 1, 4))
+					/*
+					 * A string with a hexadecimal-encoded integer.
+					 */
+
+					var
+						pif_LongInt/SignedDouble/Tracker = new src.type
+
+						delta = 2 // Basically the amount of prefix characters there are.
+						length
+
+						const
+							HEX_ZERO      = 0x0000
+							HEX_NINE      = 0x0009
+							HEX_FIFTEEN   = 0x000F
+
+							ASCII_ZERO	  = 48
+							ASCII_NINE    = 57
+							ASCII_DIFF	  = 39
+
+							LOWERCASE_BIT = 32 // Turning this bit on will convert an uppercase
+											   // character to lowercase.
+
+						negate_flag = findtext(String, "-", 1, 2)
+					delta = negate_flag ? (delta+1) : delta
+					length = length(String) - delta
+
+					Tracker.SetModeFlag(NEW_OBJECT, 0)
+
+					for(var/i = length, i > 0, i --)
+						// This loop starts from the *end* of the string and moves forward, so we
+						// can get the least-significant characters first. This is largely because
+						// it makes the math a bit easier.
+						var/c = text2ascii(String, i+delta)
+
+						if(c > ASCII_NINE)
+							// If it's non-numeric, then make it lowercase so we can have consistent
+							// behavior.
+							c |= LOWERCASE_BIT
+
+						// We subtract the value of ASCII_ZERO so that "0" maps to 0, "1" maps to
+						// 1, ..., and "9" maps to 9...
+						c -= ASCII_ZERO
+
+						if(c > HEX_NINE)
+							// ... but, "a", ..., "f" will map to 49, ..., 54, so we have to subtract
+							// the correct difference (ASCII_DIFF) to have them map to 10, ..., 15.
+							c -= ASCII_DIFF
+
+						if( (c < HEX_ZERO) || (c > HEX_FIFTEEN) )
+							// If we've encountered an invalid character, throw an exception.
+							throw new /pif_Arithmetic/InvalidStringEncodingException(__FILE__, __LINE__)
+
+						if((length - i) < 4)
+							// If i is in the range [0, 4) then we can still write to the first block.
+							Tracker.Add(0x0000, c << 4*(length - i))
+						else if((length - i) < 8)
+							// If i is in the range [4, 8) then we can still write to the second block.
+							Tracker.Add(c << 4*((length - i) - 4), 0x0000)
+						else
+							// If i is 8 or more, then there are no more blocks to write to.
+
+							if(!(mode & OVERFLOW_EXCEPTION))
+								// If we're at a point larger than can be stored in a double precision
+								// integer, and if we're aren't tracking for overflow, then just stop
+								// the loop.
+								break
+
+							else if(c != HEX_ZERO)
+								// Otherwise, wait until we find a non-zero term and throw the
+								// exception.
+								throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+					if(negate_flag)
+						Tracker.Negate()
+
+					Data[1] = Tracker._GetBlock(1)
+					Data[2] = Tracker._GetBlock(2)
+
+				else if(findtext(String, regex("0\[^0-9]"), 1, 3))
+					// We found another prefix but one that is unsupported.
+					throw new /pif_Arithmetic/InvalidStringPrefixException(__FILE__, __LINE__)
+
+				else
+					// If only the character 0-9 show up in the string, then it's a valid decimal
+					// string and we may proceed.
+
+					// Anything else and we assume a decimal-encoded string was passed. This method
+					// seems a bit slow, so I'd love to figure out a faster version.
+
+					var
+						pif_LongInt/SignedDouble
+							// This tracks the current position. That is, at each step we multiply it by
+							// ten to keep it in the right position.
+							PositionTracker = new src.type(1)
+							Buffer = new src.type // Temporarily holds a product before adding it to
+												  // the Tracker object.
+
+							Tracker = new src.type // Tracks the final value.
+
+						length = length(String)
+
+						const/ASCII_ZERO = 48
+
+					PositionTracker.SetModeFlag(OVERFLOW_EXCEPTION, mode & OVERFLOW_EXCEPTION)
+					PositionTracker.SetModeFlag(NEW_OBJECT, 0)
+
+					Tracker.SetModeFlag(NEW_OBJECT, 0)
+					Buffer.SetModeFlag(NEW_OBJECT, 0)
+
+					for(var/i = length, i > 0, i --)
+						// This loop starts from the *end* of the string and moves forward, so we
+						// can get the least-significant characters first. This is largely because
+						// it makes the math a bit easier.
+
+						var/c = text2ascii(String, i) - ASCII_ZERO
+
+						if((c < 0) || (c > 9))
+							// If we've encountered an invalid character, throw an exception.
+							throw new /pif_Arithmetic/InvalidStringEncodingException(__FILE__, __LINE__)
+
+						else if(c != 0)
+							// If c is non-zero, then compute the corresponding value, store it in the
+							// buffer, and add it to the tracker.
+
+							// If c is non-zero, then we store the value in the buffer, multiply the
+							// buffer by the current position as stored in PositionTracker, and then add
+							// the result to the Tracker object.
+
+							Buffer.Set(c)
+							Tracker.Add(Buffer.Multiply(PositionTracker))
+
+						PositionTracker.Multiply(10)
+
+					Data[1] = Tracker._GetBlock(1)
+					Data[2] = Tracker._GetBlock(2)
+
+
+		/*
+
+		7.  proc/Method(...)
+
+		       A left-significant list of integer arguments. See 3. for details on this format.
+
+		*/
+
+			else if(isnum(arguments[1]))
+				// This situation is when a single integer has been passed as an argument.
+
+				var
+					Integer = arguments[1]
+
+					block_1
+					block_2
+
+					negate_flag = 0
+
+				if(!isnum(Integer))
+					throw new /pif_Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+				else if(round(Integer) != Integer)
+					// Must be an integer.
+					throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+
+				if(Integer < 0)
+					// If it's less than zero, we negate Integer and mark the data as needing negated
+					// back at the end.
+
+					Integer = -Integer
+					negate_flag = 1
+
+				// Any other value we'll interpret as an integer. Only values in the range [0,
+				// 16777215] are guaranteed to be accurate; above that range, it may not be
+				// accurate and either strings or lists of two elements should be used.
+
+				block_1 = Integer % 65536
+				block_2 = (Integer - block_1) / 65536
+
+				if(negate_flag)
+					block_1 = ~block_1
+					block_2 = ~block_2
+
+					var
+						byte1 = pliBYTE_ONE(block_1) // Least significant.
+						byte2 = pliBYTE_TWO(block_1)
+						byte3 = pliBYTE_ONE(block_2)
+						byte4 = pliBYTE_TWO(block_2) // Most significant.
+
+					byte1 ++
+					pliADDBUFFER(byte1, byte2)
+					pliADDBUFFER(byte2, byte3)
+					pliADDBUFFER(byte3, byte4)
+
+					block_1 = byte1 | pliBYTE_ONE_SHIFTED(byte2)
+					block_2 = byte3 | pliBYTE_ONE_SHIFTED(byte4)
+
+				Data[1] = block_1
+				Data[2] = block_2
+
+		/*
+
+		If the format provided for a GAAF-specified method does not match one of the above formats, then a
+		/pif_Arithmetic/InvalidArgumentFormatException exception is thrown.
+
+		*/
+
+			else
+				throw new /pif_Arithmetic/InvalidArgumentFormatException(__FILE__, __LINE__)
+
+		/*
+
+		TODO:
+
+		5.  proc/Method(String, Base, EncodingRef)
+
+		  i.   String is an arbitrary string. If this is argument is not a string or is a zero-length
+		       string (i.e., "") then a /pif_Arithmetic/InvalidStringArgumentException exception is
+		       thrown.
+
+		  ii.  Base is a positive integer indicating the base the string. If Base does not satisfy these
+		       requirements (e.g. Base is a non-integer, or is zero or negative) then a /pif_Arithmetic/InvalidStringBaseException
+		       exception is thrown.
+
+		  iii. EncodingRef is a proc typepath (e.g., /proc/MyEncodingProc) that accepts a single
+		       character from the string and outputs a positive integer that indicates the value of that
+		       character. If the returned value is not a positive integer, a /pif_Arithmetic/InvalidStringEncodingValueException
+		       exception is thrown. If EncodingRef accepts an invalid character, a /pif_Arithmetic/InvalidStringEncodingException
+		       exception is thrown by the EncodingRef proc.
+
+		6.  proc/Method(String, Base, datum/EncodingObj, EncodingRef)
+
+		  i.   String is an arbitrary string. If this is argument is not a string or is a zero-length
+		       string (i.e., "") then a /pif_Arithmetic/InvalidStringArgumentException exception is thrown.
+
+		  ii.  Base is a positive integer indicating the base the string. If Base does not satisfy these
+		       requirements (e.g. Base is a non-integer, or is zero or negative) then a /pif_Arithmetic/InvalidStringBaseException
+		       exception is thrown.
+
+		  iii. EncodingObj is an object that EncodingRef is attached to. If this argument is not an
+		       object, then a /pif_Arithmetic/InvalidStringEncodingObjException exception is thrown.
+
+		  iv.  EncodingRef is a string (e.g., "MyEncodingMethod") that is the name of a method on the
+		       EncodingObj object. This omethod accepts a single character from the string and outputs a
+		       positive integer that indicates the value of that character. If the returned value is not
+		       a positive integer, a /pif_Arithmetic/InvalidStringEncodingValueException exception is
+		       thrown. If EncodingRef accepts an invalid character, a /pif_Arithmetic/InvalidStringEncodingException
+		       exception is thrown by the EncodingRef method.
+
+		*/
+
+		// ...
+
+		/*
+
+		7.  proc/Method(...)
+
+		       A left-significant list of integer arguments. See 3. for details on this format.
+
+		*/
+
+		else
+			var
+				block_1 = arguments[arguments.len  ]
+				block_2 = arguments[arguments.len-1]
+
+			if(!isnum(block_1) || !isnum(block_2))
+				throw new /pif_Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+			else if( (round(block_1) != block_1) || (round(block_2) != block_2) )
+				throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+
+			// Because this class is unsigned, we will interpret negative values as bitstrings.
+			if(block_1 < 0)
+				block_1 &= 0xFFFF
+			if(block_2 < 0)
+				block_2 &= 0xFFFF
+
+			Data[1] = block_1
+			Data[2] = block_2
+
+			for(var/i = 1, i <= arguments.len-2, i ++)
+				// Now we look through the rest of the arguments to make sure they don't violate
+				// any requirements of the GAAF format.
+
+				var/block = arguments[i]
+
+				if(!isnum(block))
+					throw new /pif_Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+				else if(round(block) != block)
+					throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+				else if((mode & OVERFLOW_EXCEPTION) && (block != 0))
+					// If there is non-zero data and OVERFLOW_EXCEPTION mode is enabled, then the
+					// incoming data is too large to read in and we must throw the exception.
+					throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+		return Data
+
 	Negate()
 		// Note that if A = 0x80000000, then A.Negate() == A. This is allowed by
 		// the pif_Arithmetic protocol, and is basically a drawback of using two's
