@@ -37,6 +37,10 @@ unsigned double precision integers are available.
   3. Release Notes
   ----------------------------------------------------
 
+  Version b1.2.2016####.
+
+    -
+
   Version b1.1.20160502.
 
     - Fixed several errors in computing remainders and quotients in division in the UnsignedDouble
@@ -64,10 +68,13 @@ unsigned double precision integers are available.
   ----------------------------------------------------
 
   - Write up complete documentation for the library.
-  - Fully-implemented the SignedDouble class.
   - Implement classes for both signed and unsigned triple and quadruple-precision integers.
   - Set up a preprocessor flag that toggles allowing negative remainders or having only positive
     remainders. Currently, negative remainders are allowed to appear.
+  - "Emancipate" SignedDouble from UnsignedDouble. That is, alter SignedDouble so that it is no
+    longer a child class of UnsignedDouble. The approach of making it a child class of
+    UnsignedDouble, in retrospect, seems like poor design and does not help as much as I thought it
+    would.
 
 ****************************************************************************************************
 ****************************************************************************************************/

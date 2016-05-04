@@ -68,10 +68,9 @@ pif_LongInt/SignedDouble
 						if(IntegerObject._GetBlock(i) != 0)
 							throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
 
-				else
-					// Otherwise, just assign the relevant data to the list.
-					Data[1] = IntegerObject._GetBlock(1)
-					Data[2] = IntegerObject._GetBlock(2)
+				// Otherwise, just assign the relevant data to the list.
+				Data[1] = IntegerObject._GetBlock(1)
+				Data[2] = IntegerObject._GetBlock(2)
 
 			else if(istype(arguments[1], /datum))
 				// If it's some other type of object, we'll assume it's something that implements the pif_Arithmetic
@@ -93,9 +92,8 @@ pif_LongInt/SignedDouble
 						if(pif_ArithmeticObject._GetBlock(i) != 0)
 							throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
 
-				else
-					Data[1] = pif_ArithmeticObject._GetBlock(1)
-					Data[2] = pif_ArithmeticObject._GetBlock(2)
+				Data[1] = pif_ArithmeticObject._GetBlock(1)
+				Data[2] = pif_ArithmeticObject._GetBlock(2)
 
 		/*
 

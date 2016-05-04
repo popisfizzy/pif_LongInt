@@ -16,7 +16,7 @@ LongInt
 
 	var
 		// By default, we do in-place modification to pif_LongInt objects.
-		mode = OLD_OBJECT | NO_OVERFLOW_EXCEPTION
+		mode = OLD_OBJECT | NO_OVERFLOW_EXCEPTION | FIXED_PRECISION
 
 	/*
 	 * pif_Arithmetic defined methods.
