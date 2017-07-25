@@ -1,7 +1,7 @@
 /**
  ** pif_LongInt
- **   Version: b1.1.2016####
- **   Release Date: MONTH DD, 2016
+ **   Version: b1.1.20170724
+ **   Release Date: July 24, 2017
  **
  ***************************************************************************************************
  ***************************************************************************************************
@@ -37,7 +37,7 @@ unsigned integers are currently available in the beta.
   3. Release Notes
   ----------------------------------------------------
 
-  Version b1.1.0.2016####.
+  Version b1.1.0.20170724
 
     - Renamed UnsignedDouble and SignedDouble to Unsigned32 and Signed32. This makes it clearer, in
       my opinion, what their precision is and this convention will be followed for all future
