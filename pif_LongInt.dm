@@ -29,8 +29,8 @@ LongInt
 		 */
 
 		if(!isnum(n) || (round(n) != n))
-			// n is either non-numeric or a non-integer, so as per the pif_Arithmetic
-			// protocol specification we throw this exception.
+			// n is either non-numeric or a non-integer, so as per the pif_Arithmetic protocol
+			// specification we throw this exception.
 
 #if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
@@ -54,14 +54,14 @@ LongInt
 			Int = new src.type(1)		// The actual result of the power operation.
 			Tracker = new src.type(src)	// Computes success squares.
 
-		// Set Int's OVERFLOW_EXCEPTION flag equal to the source object's, so that if Int
-		// overflows it will have the same behavior as the source object.
+		// Set Int's OVERFLOW_EXCEPTION flag equal to the source object's, so that if Int overflows
+		// it will have the same behavior as the source object.
 		Int.SetModeFlag(OVERFLOW_EXCEPTION, src.mode & OVERFLOW_EXCEPTION)
 
 		while(n != 0)
-			// This is an implementation of exponentiation-by-squaring, which is
-			// fairly-efficient algorithm when working with an exponent that is readily
-			// -accessed in binary form and when you have a good way of squaring.
+			// This is an implementation of exponentiation-by-squaring, which is fairly-efficient
+			// algorithm when working with an exponent that is readily -accessed in binary form and
+			// when you have a good way of squaring.
 
 			if((n & 0x0001) == 1)
 				Int = Int.Multiply(Tracker)
@@ -89,7 +89,7 @@ LongInt
 		PrintOctal()
 		PrintBase64()
 
-#ifdef	PIF_LONGINT_PRINT_UNARY
+#ifdef	PIF_LONGINT_PRINTUNARY
 
 		// And unary, for literally no other reason than as a stupid joke.
 		PrintUnary()

@@ -1,14 +1,14 @@
 /**
  ** pif_LongInt
- **   Version: b1.1.20160502
- **   Release Date: May 2, 2016
+ **   Version: b1.1.2016####
+ **   Release Date: MONTH DD, 2016
  **
  ***************************************************************************************************
  ***************************************************************************************************
 
 pif_LongInt is a library that implements both signed and unsigned double, triple, and quadruple
 precision (32-bit, 48-bit, and 64-bit) integers. In this beta version, only 32-bit signed and
-unsigned double precision integers are available.
+unsigned integers are currently available in the beta.
 
  +------------------------+
  |                        |
@@ -37,9 +37,25 @@ unsigned double precision integers are available.
   3. Release Notes
   ----------------------------------------------------
 
-  Version b1.2.2016####.
+  Version b1.1.0.2016####.
 
-    -
+    - Renamed UnsignedDouble and SignedDouble to Unsigned32 and Signed32. This makes it clearer, in
+      my opinion, what their precision is and this convention will be followed for all future
+      classes.
+    - "Emancipated" the Signed32 class from Unsigned32. That is, Signed32 was rewritten so that it
+      was not a child of Unsigned32, and instead inherits directly from the pif_LongInt class. The
+      approach of making Signed32 a child of Unsigned32 seemed a good idea originally, but in
+      retrospect it is not as useful as it once seemed due to a realization I had regarding handling
+      overflow exceptions. Furthermore, a Signed32 can not replace an Unsigned32 in a method and
+      keep the same functionality, due to their significantly-different range and so it is also poor
+      design. Doing it as a sister class of Unsigned32 involves copying more code, but it's a better
+      way of doing it in the long run.
+    - Fixed the joke /Signed32.PrintUnary() method so that it works correctly for negative
+      numbers.
+    - Fixed an bug with the Signed32 class that would result in it throwing an overflow
+      exception in the cases when UnsignedDouble would have an overflow, even though the situations
+      where signed and unsigned doubles overflow are very different.
+
 
   Version b1.1.20160502.
 
@@ -71,10 +87,6 @@ unsigned double precision integers are available.
   - Implement classes for both signed and unsigned triple and quadruple-precision integers.
   - Set up a preprocessor flag that toggles allowing negative remainders or having only positive
     remainders. Currently, negative remainders are allowed to appear.
-  - "Emancipate" SignedDouble from UnsignedDouble. That is, alter SignedDouble so that it is no
-    longer a child class of UnsignedDouble. The approach of making it a child class of
-    UnsignedDouble, in retrospect, seems like poor design and does not help as much as I thought it
-    would.
 
 ****************************************************************************************************
 ****************************************************************************************************/

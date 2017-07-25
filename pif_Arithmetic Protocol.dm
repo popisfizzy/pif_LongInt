@@ -134,7 +134,7 @@ They are as follows.
       i.   List is a /list object that is interpreted as left-significant. That is, the left-most
            entry ("block") of the list (the entry with the lowest index) is interpreted as the
            most-significant element of that list, while the right-most block (the entry with the
-           highest index) is interpreted as the most-significant element of that list. This is so
+           highest index) is interpreted as the least-significant element of that list. This is so
            that something of the form
 
              Method(0x6789, 0xABCD)
@@ -143,8 +143,9 @@ They are as follows.
            as right-significant, this would instead be the number 0xABCD6789.
 
            All elements of the list should be integers. If a non-integer is found in the list, then
-           a /pif_Arithmetic/NonIntegerException exception should be thrown. If a non-numeric value is
-           found then a /pif_Arithmetic/NonNumericInvalidPositionException exception should be thrown.
+           a /pif_Arithmetic/NonIntegerException exception should be thrown. If a non-numeric value
+		   is found then a /pif_Arithmetic/NonNumericInvalidPositionException exception should be
+		   thrown.
 
            If a list contains only one element, then,
 
@@ -159,8 +160,8 @@ They are as follows.
            left to the implementation.
 
            If the list contains more than one element, then the resulting data should be treated as
-           raw binary data by performing bitwise AND with the data and the value 0xFFFF. There should
-           be no regard for sign data or floating point values.
+           raw binary data by performing bitwise AND with the data and the value 0xFFFF. There
+		   should be no regard for sign data or floating point values.
 
   4.  proc/Method(String)
 
@@ -211,7 +212,8 @@ They are as follows.
   6.  proc/Method(String, Base, datum/EncodingObj, EncodingRef)
 
       i.   String is an arbitrary string. If this is argument is not a string or is a zero-length
-           string (i.e., "") then a /pif_Arithmetic/InvalidStringArgumentException exception is thrown.
+           string (i.e., "") then a /pif_Arithmetic/InvalidStringArgumentException exception is
+		   thrown.
 
       ii.  Base is a positive integer indicating the base the string. If Base does not satisfy these
            requirements (e.g. Base is a non-integer, or is zero or negative) then a /pif_Arithmetic/InvalidStringBaseException
@@ -233,9 +235,9 @@ They are as follows.
 
 If the format provided as the arguments to a GAAF_specified method do not match one of the above
 formats (and this can be determined) then a /pif_Arithmetic/InvalidArgumentFormatException exception
-should be thrown. In practice, this may be difficult to determine because Format 7. provides a "catch
-all" for when others are not matched, and typically the exceptions provided in Format 3. would be of
-more use than the /pif_Arithmetic/InvalidArgumentFormatException exception.
+should be thrown. In practice, this may be difficult to determine because Format 7. provides a
+"catch all" for when others are not matched, and typically the exceptions provided in Format 3.
+would be of more use than the /pif_Arithmetic/InvalidArgumentFormatException exception.
 
 */
 
@@ -359,8 +361,8 @@ more use than the /pif_Arithmetic/InvalidArgumentFormatException exception.
 
 			  Note.
 
-			    If A is the dividend (source object) and B is the divisor (argument) then the following
-			    relationship should always hold between Quotient() and Remainder():
+			    If A is the dividend (source object) and B is the divisor (argument) then the
+				following relationship should always hold between Quotient() and Remainder():
 
 			      B * (A.Quotient(B)) + (A.Remainder(B)) == A.
 
@@ -390,8 +392,8 @@ more use than the /pif_Arithmetic/InvalidArgumentFormatException exception.
 
 			  Note.
 
-			    If A is the dividend (source object) and B is the divisor (argument) then the following
-			    relationship should always hold between Quotient() and Remainder():
+			    If A is the dividend (source object) and B is the divisor (argument) then the
+				following relationship should always hold between Quotient() and Remainder():
 
 			      B * (A.Quotient(B)) + (A.Remainder(B)) == A.
 
@@ -426,8 +428,8 @@ more use than the /pif_Arithmetic/InvalidArgumentFormatException exception.
 
 		      Note.
 
-		        This should have the same behavior as the following code for an object Integer of some
-		        IntegerClass class that implements the pif_Arithmetic protocol.
+		        This should have the same behavior as the following code for an object Integer of
+				some IntegerClass class that implements the pif_Arithmetic protocol.
 
 		          var/IntegerClass/OriginalInt = new(Integer)
 		          for(var/i = 1, i <= N, i ++)
@@ -558,8 +560,8 @@ more use than the /pif_Arithmetic/InvalidArgumentFormatException exception.
 		        returned by Minimum(). This is because, in two's complement notation, the largest
 		        negative number can not be converted to positive without a loss of precision. Two
 		        reasonable behaviors are to return 0 (an object equivalent to that output by the
-		        Zero() method) or return an object equal to the original object (an object equivalent
-		        to that output by the Minimum() method).
+		        Zero() method) or return an object equal to the original object (an object
+				equivalent to that output by the Minimum() method).
 
 			*/
 
@@ -1416,9 +1418,8 @@ more use than the /pif_Arithmetic/InvalidArgumentFormatException exception.
 		PrintBinary()
 			/*
 
-			Outputs a binary-encoded string equal to the value of the source object. It should
-			be essentially a plain read-out of the stored binary data, and include nothing about
-			signs.
+			Outputs a binary-encoded string equal to the value of the source object. It should be
+			essentially a plain read-out of the stored binary data, and include nothing about signs.
 
 			  Arguments.
 
@@ -1433,8 +1434,8 @@ more use than the /pif_Arithmetic/InvalidArgumentFormatException exception.
 		PrintDecimal()
 			/*
 
-			Outputs a decimal-encoded string equal to the value of the source object. This should
-			be in standard decimal notation, and include signs if necessary (e.g., for negative
+			Outputs a decimal-encoded string equal to the value of the source object. This should be
+			in standard decimal notation, and include signs if necessary (e.g., for negative
 			numbers).
 
 			  Arguments.
@@ -1451,8 +1452,8 @@ more use than the /pif_Arithmetic/InvalidArgumentFormatException exception.
 			/*
 
 			Outputs a hexadecimal-encoded string equal to the value of the source object. It should
-			be essentially a plain read-out of the stored hexadecimal data, and include nothing about
-			signs.
+			be essentially a plain read-out of the stored hexadecimal data, and include nothing
+			about signs.
 
 			  Arguments.
 
@@ -1650,10 +1651,10 @@ more use than the /pif_Arithmetic/InvalidArgumentFormatException exception.
 			  Behavior.
 
 			    This outputs an object of the same type as the local method class which is the
-                "minimum" integer that can be stored on N blocks. By "minimum", this is an object such
-                that if it were decrement it would overflow; equivalently, one can imagine it as the
-                largest (in absolute value) non-positive integer represented given the width of the
-                object.
+                "minimum" integer that can be stored on N blocks. By "minimum", this is an object
+				such that if it were decrement it would overflow; equivalently, one can imagine it
+				as the largest (in absolute value) non-positive integer represented given the width
+				of the object.
 
 			    If the FIXED_WIDTH flag is not set, then this should instead output the largest (in
                 absolute value) non-positive integer representable in N blocks.

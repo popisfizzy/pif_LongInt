@@ -8,8 +8,8 @@
 #include "pif_Arithmetic Protocol.dm"
 #include "pif_LongInt.dm"
 
-#include "pif_LongInt Subclasses/UnsignedDouble.dm"
-#include "pif_LongInt Subclasses/SignedDouble.dm"
+#include "pif_LongInt Subclasses/Unsigned32.dm"
+#include "pif_LongInt Subclasses/Signed32.dm"
 // MAIN LIBRARY CODE
 
 // INCLUDE LAST
