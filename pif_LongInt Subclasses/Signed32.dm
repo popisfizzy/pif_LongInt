@@ -1,4 +1,4 @@
-k/*
+/*
  * Implementation of an signed double precision (32-bit) integer that uses the pif_Arithmetic
  * protocol. Numbers are stored in two's complement form, and thus have a precision between
  * -2,147,483,648 (-2**31) and 2,147,483,647 (2**31-1). That is, between 0x80000000 and 0x7FFFFFFF
