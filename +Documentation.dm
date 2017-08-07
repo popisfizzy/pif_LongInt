@@ -1,7 +1,7 @@
 /**
  ** pif_LongInt
- **   Version: b1.1.20170724
- **   Release Date: July 24, 2017
+ **   Version: b1.1.1.20170806
+ **   Release Date: August 6, 2017
  **
  ***************************************************************************************************
  ***************************************************************************************************
@@ -36,6 +36,14 @@ unsigned integers are currently available in the beta.
 
   3. Release Notes
   ----------------------------------------------------
+
+  Version b1.1.1.20170806
+
+    - Fixed a bug where calling the constructor with the single argument of null would cause the
+      value of the object to be set to 65536 instead of 0. This was caused by a typo where I wrote a
+      1 in the code instead of a 0. Small errors in code...
+
+      Thanks goes to Reformist for both finding this error and what was causing it.
 
   Version b1.1.0.20170724
 

@@ -68,7 +68,7 @@ pif_LongInt/Unsigned32
 
 				if(isnull(arguments[1]))
 					Data[1] = 0
-					Data[2] = 1
+					Data[2] = 0
 
 			/*
 
