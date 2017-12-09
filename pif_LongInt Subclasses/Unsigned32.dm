@@ -4,7 +4,11 @@
  * and 4,294,967,295 (2**32 - 1) (between 0x00000000 and 0xFFFFFFFF).
  */
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 pif_LongInt/Unsigned32
+#else
+LongInt/Unsigned32
+#endif
 	/*
 	 * Variables.
 	 */
@@ -83,11 +87,20 @@ pif_LongInt/Unsigned32
 			           exception.
 			*/
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 				else if(istype(arguments[1], /pif_LongInt))
+#else
+
+				else if(istype(arguments[1], /LongInt))
+#endif
 					// If it's a pif_LongInt object, we can be a little more sure that we're dealing
 					// with an object that implements the pif_Arithmetic protocol.
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 					var/pif_LongInt/IntegerObject = arguments[1]
+#else
+					var/LongInt/IntegerObject = arguments[1]
+#endif
 
 					if((IntegerObject.Length() > Length) && (mode & OVERFLOW_EXCEPTION))
 						var/L = IntegerObject.Length()
@@ -291,7 +304,11 @@ pif_LongInt/Unsigned32
 						 */
 
 						var
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 							pif_LongInt/Unsigned32/Tracker = new src.type
+#else
+							LongInt/Unsigned32/Tracker = new src.type
+#endif
 							length = length(String) - 2 // Subtracting two because of the prefix.
 
 							const/ASCII_ZERO = 48
@@ -334,7 +351,11 @@ pif_LongInt/Unsigned32
 						 */
 
 						var
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 							pif_LongInt/Unsigned32/Tracker = new src.type
+#else
+							LongInt/Unsigned32/Tracker = new src.type
+#endif
 							length = length(String) - 2 // Subtracting two because of the prefix.
 
 							const
@@ -414,7 +435,11 @@ pif_LongInt/Unsigned32
 						// method seems a bit slow, so I'd love to figure out a faster version.
 
 						var
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 							pif_LongInt/Unsigned32
+#else
+							LongInt/Unsigned32
+#endif
 								// This tracks the current position. That is, at each step we
 								// multiply it by ten to keep it in the right position.
 								PositionTracker = new src.type(1)
@@ -644,7 +669,11 @@ pif_LongInt/Unsigned32
 			Int_block_1 = Processed[1] // Least significant.
 			Int_block_2 = Processed[2] // Most significant.
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			pif_LongInt/Unsigned32/Sum
+#else
+			LongInt/Unsigned32/Sum
+#endif
 
 		if(mode & NEW_OBJECT)
 			Sum = new src.type(src)
@@ -695,7 +724,11 @@ pif_LongInt/Unsigned32
 			Int_block_1 = Processed[1] // Least significant.
 			Int_block_2 = Processed[2] // Most significant.
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			pif_LongInt/Unsigned32/Diff
+#else
+			LongInt/Unsigned32/Diff
+#endif
 
 		if(mode & NEW_OBJECT)
 			Diff = new src.type(src)
@@ -744,7 +777,11 @@ pif_LongInt/Unsigned32
 			Int_block_1 = Processed[1] // Least significant.
 			Int_block_2 = Processed[2] // Most significant.
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			pif_LongInt/Unsigned32/Prod
+#else
+			LongInt/Unsigned32/Prod
+#endif
 
 		if(mode & NEW_OBJECT)
 			Prod = new src.type(null)
@@ -1577,7 +1614,11 @@ pif_LongInt/Unsigned32
 		 * Set Quot as needed.
 		 */
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			pif_LongInt/Unsigned32/Quot
+#else
+			LongInt/Unsigned32/Quot
+#endif
 		if(mode & NEW_OBJECT)
 			Quot = new src.type
 		else
@@ -1623,7 +1664,11 @@ pif_LongInt/Unsigned32
 		 * Set the remainder correctly.
 		 */
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			pif_LongInt/Unsigned32/Rem
+#else
+			LongInt/Unsigned32/Rem
+#endif
 		if(mode & NEW_OBJECT)
 			Rem = new src.type
 		else
@@ -1737,8 +1782,11 @@ pif_LongInt/Unsigned32
 			list
 				Processed
 				D
-
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			pif_LongInt/Unsigned32
+#else
+			LongInt/Unsigned32
+#endif
 				Rem = new src.type
 
 		/*
@@ -1886,7 +1934,11 @@ pif_LongInt/Unsigned32
 	Increment()
 		// Adding 1 to the object.
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 		var/pif_LongInt/Unsigned32/Sum
+#else
+		var/LongInt/Unsigned32/Sum
+#endif
 
 		if(mode & NEW_OBJECT)
 			Sum = new src.type
@@ -1922,7 +1974,11 @@ pif_LongInt/Unsigned32
 	Decrement()
 		// Subtracting 1 from the object.
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 		var/pif_LongInt/Unsigned32/Diff
+#else
+		var/LongInt/Unsigned32/Diff
+#endif
 
 		if(mode & NEW_OBJECT)
 			Diff = new src.type
@@ -1962,7 +2018,11 @@ pif_LongInt/Unsigned32
 		// Unsigned, so we'll simply return the object itself.
 
 		if(mode & NEW_OBJECT)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			return new /pif_LongInt/Unsigned32(src)
+#else
+			return new /LongInt/Unsigned32(src)
+#endif
 		else
 			return src
 
@@ -1975,7 +2035,11 @@ pif_LongInt/Unsigned32
 
 		var
 			// The final result.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			pif_LongInt/Unsigned32/Square
+#else
+			LongInt/Unsigned32/Square
+#endif
 
 			// Bytes of src.
 
@@ -2116,7 +2180,11 @@ pif_LongInt/Unsigned32
 
 	BitwiseNot()
 		if(mode & NEW_OBJECT)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			var/pif_LongInt/Unsigned32/Int = new src.type(src)
+#else
+			var/LongInt/Unsigned32/Int = new src.type(src)
+#endif
 
 			Int.block_1 = ~Int.block_1
 			Int.block_2 = ~Int.block_2
@@ -2141,7 +2209,11 @@ pif_LongInt/Unsigned32
 		 */
 
 		if(mode & NEW_OBJECT)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			var/pif_LongInt/Unsigned32/Int = new src.type(src)
+#else
+			var/LongInt/Unsigned32/Int = new src.type(src)
+#endif
 
 			Int.block_1 &= b1
 			Int.block_2 &= b2
@@ -2166,7 +2238,11 @@ pif_LongInt/Unsigned32
 		 */
 
 		if(mode & NEW_OBJECT)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			var/pif_LongInt/Unsigned32/Int = new src.type(src)
+#else
+			var/LongInt/Unsigned32/Int = new src.type(src)
+#endif
 
 			Int.block_1 |= b1
 			Int.block_2 |= b2
@@ -2191,7 +2267,11 @@ pif_LongInt/Unsigned32
 		 */
 
 		if(mode & NEW_OBJECT)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			var/pif_LongInt/Unsigned32/Int = new src.type(src)
+#else
+			var/LongInt/Unsigned32/Int = new src.type(src)
+#endif
 
 			Int.block_1 ^= b1
 			Int.block_2 ^= b2
@@ -2216,7 +2296,11 @@ pif_LongInt/Unsigned32
 			// Holds the overflow from block_1 into block_2.
 			hold
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			var/pif_LongInt/Unsigned32/Int
+#else
+			var/LongInt/Unsigned32/Int
+#endif
 
 		/*
 		 * Computation
@@ -2256,7 +2340,11 @@ pif_LongInt/Unsigned32
 			hold_1
 			hold_2
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			var/pif_LongInt/Unsigned32/Int
+#else
+			var/LongInt/Unsigned32/Int
+#endif
 
 		/*
 		 * Computation
@@ -2297,7 +2385,11 @@ pif_LongInt/Unsigned32
 			// Holds the overflow from block_1 into block_2.
 			hold
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			var/pif_LongInt/Unsigned32/Int
+#else
+			var/LongInt/Unsigned32/Int
+#endif
 
 		/*
 		 * Computation
@@ -2337,7 +2429,11 @@ pif_LongInt/Unsigned32
 			hold_1
 			hold_2
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			var/pif_LongInt/Unsigned32/Int
+#else
+			var/LongInt/Unsigned32/Int
+#endif
 
 		/*
 		 * Computation
@@ -2399,7 +2495,11 @@ pif_LongInt/Unsigned32
 	 * Comparison methods.
 	 */
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 	Compare(pif_LongInt/Int)
+#else
+	Compare(LongInt/Int)
+#endif
 		// While the pif_Arithmetic protocol only requires a guarantee that comparisons against
 		// incoming data will work correctly for data of the same (or less) length and the same
 		// sign behavior, pif_LongInt will additionally guarantee that comparisons against other
@@ -2550,7 +2650,11 @@ pif_LongInt/Unsigned32
 
 	PrintDecimal()
 		var
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			pif_LongInt/Unsigned32
+#else
+			LongInt/Unsigned32/
+#endif
 				Printer = new src.type(src)
 				R
 			list/QR
@@ -2653,10 +2757,1076 @@ pif_LongInt/Unsigned32
 
 	Maximum()
 		// 4,294,967,295 = 2**32 - 1
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 		return new /pif_LongInt/Unsigned32(0xFFFF, 0xFFFF)
+#else
+		return new /LongInt/Unsigned32(0xFFFF, 0xFFFF)
+#endif
 	Minimum()
 		// 0.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 		return new /pif_LongInt/Unsigned32(0x0000, 0x0000)
+#else
+		return new /LongInt/Unsigned32(0x0000, 0x0000)
+#endif
 
 	Zero()
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 		return new /pif_LongInt/Unsigned32(0x0000, 0x0000)
+#else
+		return new /LongInt/Unsigned32(0x0000, 0x0000)
+#endif
+
+#if	(DM_VERSION < 512)
+#warn BYOND v512 or newer required for operator overloading
+#else
+
+/*
+ * Operator overloading methods. These are largely copied and pasted from the above methods,
+ * with minor changes where necessary. Refer to the corresponding method above for documentation
+ * (e.g. refer to the Add() method for operator+() and operator+=()), as I've removed the comments
+ * for brevity, except to note other changes.
+ *
+ * Throughout the following, the "plain" operators follow the behavior of NEW_OPERATOR flag (that
+ * is, a new object is created), while the assignment operators (e.g., +=, -=, etc.) follow the
+ * behavior of the OLD_OBJECT flag (the object is changed in place).
+ */
+
+	proc/operator+(...)
+		var
+			list/Processed = _ProcessArguments(args)
+
+			Int_block_1 = Processed[1]
+			Int_block_2 = Processed[2]
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
+			pif_LongInt/Unsigned32/Sum = new src.type(src)
+#else
+			LongInt/Unsigned32/Sum = new src.type(src)
+#endif
+
+		var
+			B1 = 0
+			B2 = 0
+
+		B1 = pliBYTE_ONE(block_1) + pliBYTE_ONE(Int_block_1)
+		B2 = pliBYTE_TWO(block_1) + pliBYTE_TWO(Int_block_1) + pliBUFFER(B1)
+
+		Sum._SetBlock(1, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
+
+		B1 = pliBYTE_ONE(block_2) + pliBYTE_ONE(Int_block_2) + pliBUFFER(B2)
+		B2 = pliBYTE_TWO(block_2) + pliBYTE_TWO(Int_block_2) + pliBUFFER(B1)
+
+		Sum._SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
+
+		if( (pliBUFFER(B2) != 0) && (mode & OVERFLOW_EXCEPTION) )
+			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+		return Sum
+
+	proc/operator+=(...)
+		var
+			list/Processed = _ProcessArguments(args)
+
+			Int_block_1 = Processed[1]
+			Int_block_2 = Processed[2]
+
+		var
+			B1 = 0
+			B2 = 0
+
+		B1 = pliBYTE_ONE(block_1) + pliBYTE_ONE(Int_block_1)
+		B2 = pliBYTE_TWO(block_1) + pliBYTE_TWO(Int_block_1) + pliBUFFER(B1)
+
+		_SetBlock(1, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
+
+		B1 = pliBYTE_ONE(block_2) + pliBYTE_ONE(Int_block_2) + pliBUFFER(B2)
+		B2 = pliBYTE_TWO(block_2) + pliBYTE_TWO(Int_block_2) + pliBUFFER(B1)
+
+		_SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
+
+		if( (pliBUFFER(B2) != 0) && (mode & OVERFLOW_EXCEPTION) )
+			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+		return src
+
+	proc/operator-(...)
+		var
+			list/Processed = _ProcessArguments(args)
+
+			Int_block_1 = Processed[1] // Least significant.
+			Int_block_2 = Processed[2] // Most significant.
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
+			pif_LongInt/Unsigned32/Diff = new src.type(src)
+#else
+			LongInt/Unsigned32/Diff = new src.type(src)
+#endif
+
+		var
+			B1 = 0
+			B2 = 0
+
+		B1 = pliBYTE_ONE(block_1) + pliBYTE_ONE_N(Int_block_1) + 1 // Adding one for negation.
+		B2 = pliBYTE_TWO(block_1) + pliBYTE_TWO_N(Int_block_1) + pliBUFFER(B1)
+
+		Diff._SetBlock(1, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
+
+		B1 = pliBYTE_ONE(block_2) + pliBYTE_ONE_N(Int_block_2) + pliBUFFER(B2)
+		B2 = pliBYTE_TWO(block_2) + pliBYTE_TWO_N(Int_block_2) + pliBUFFER(B1)
+
+		Diff._SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
+
+		if( (pliBUFFER(B2) == 0) && (mode & OVERFLOW_EXCEPTION) )
+			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+		return Diff
+
+	proc/operator-=(...)
+		var
+			list/Processed = _ProcessArguments(args)
+
+			Int_block_1 = Processed[1] // Least significant.
+			Int_block_2 = Processed[2] // Most significant.
+
+		var
+			B1 = 0
+			B2 = 0
+
+		B1 = pliBYTE_ONE(block_1) + pliBYTE_ONE_N(Int_block_1) + 1 // Adding one for negation.
+		B2 = pliBYTE_TWO(block_1) + pliBYTE_TWO_N(Int_block_1) + pliBUFFER(B1)
+
+		_SetBlock(1, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
+
+		B1 = pliBYTE_ONE(block_2) + pliBYTE_ONE_N(Int_block_2) + pliBUFFER(B2)
+		B2 = pliBYTE_TWO(block_2) + pliBYTE_TWO_N(Int_block_2) + pliBUFFER(B1)
+
+		_SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
+
+		if( (pliBUFFER(B2) == 0) && (mode & OVERFLOW_EXCEPTION) )
+			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+		return src
+
+	proc/operator*(...)
+		var
+			list/Processed = _ProcessArguments(args)
+
+			Int_block_1 = Processed[1]
+			Int_block_2 = Processed[2]
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
+			pif_LongInt/Unsigned32/Prod = new src.type(null)
+#else
+			LongInt/Unsigned32/Prod = new src.type(null)
+#endif
+
+		var
+			src0 = pliBYTE_ONE(block_1)
+			src1 = pliBYTE_TWO(block_1)
+			src2 = pliBYTE_ONE(block_2)
+			src3 = pliBYTE_TWO(block_2)
+
+			Int0 = pliBYTE_ONE(Int_block_1)
+			Int1 = pliBYTE_TWO(Int_block_1)
+			Int2 = pliBYTE_ONE(Int_block_2)
+			Int3 = pliBYTE_TWO(Int_block_2)
+
+			prod_1 = 0
+			prod_2 = 0
+			prod_3 = 0
+			prod_4 = 0
+
+			buffer
+
+			overflow_flag = 0
+
+		prod_1 = src0*Int0
+
+		pliADDBUFFER(prod_1, prod_2)
+		pliFLUSH(prod_1)
+
+		buffer  = src1*Int0
+
+		pliADDDATA(buffer, prod_2)
+		prod_3 = pliBUFFER(buffer) + pliBUFFER(prod_2)
+		pliFLUSH(prod_2)
+
+		buffer  = src0*Int1
+
+		pliADDDATA(buffer, prod_2)
+		prod_3 += pliBUFFER(buffer) + pliBUFFER(prod_2)
+		pliADDBUFFER(prod_3, prod_4)
+
+		pliFLUSH(prod_2)
+		pliFLUSH(prod_3)
+
+		if(overflow_flag || !(mode & OVERFLOW_EXCEPTION))
+
+			buffer  = src2*Int0
+
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
+
+			buffer  = src1*Int1
+
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
+
+			buffer  = src0*Int2
+
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
+
+		else
+			buffer  = src2*Int0
+
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
+				overflow_flag = 1
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
+
+			buffer  = src1*Int1
+
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
+				overflow_flag = 1
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
+
+			buffer  = src0*Int2
+
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
+				overflow_flag = 1
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
+
+		if(overflow_flag || !(mode & OVERFLOW_EXCEPTION))
+			prod_4 += pliDATA(src3*Int0)
+			prod_4 += pliDATA(src2*Int1)
+			prod_4 += pliDATA(src1*Int2)
+			prod_4 += pliDATA(src0*Int3)
+
+			pliFLUSH(prod_4)
+
+		else
+
+			prod_4 += src3*Int0
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
+				overflow_flag = 1
+
+			prod_4 += src2*Int1
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
+				overflow_flag = 1
+
+			prod_4 += src1*Int2
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
+				overflow_flag = 1
+
+			prod_4 += src0*Int3
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
+				overflow_flag = 1
+
+		if(!overflow_flag && (mode & OVERFLOW_EXCEPTION))
+			overflow_flag = ( (src3 != 0) && ( (Int3 != 0) || (Int2 != 0) || (Int1 != 0) )) || \
+							( (src2 != 0) && ( (Int3 != 0) && (Int2 != 0) ) ) || \
+							( (src1 != 0) && (Int3 != 0) )
+
+		Prod._SetBlock(1, prod_1 | pliBYTE_ONE_SHIFTED(prod_2) )
+		Prod._SetBlock(2, prod_3 | pliBYTE_ONE_SHIFTED(prod_4) )
+
+		if(overflow_flag && (mode & OVERFLOW_EXCEPTION))
+			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+		return Prod
+
+	proc/operator*=(...)
+		var
+			list/Processed = _ProcessArguments(args)
+
+			Int_block_1 = Processed[1]
+			Int_block_2 = Processed[2]
+
+		var
+			src0 = pliBYTE_ONE(block_1)
+			src1 = pliBYTE_TWO(block_1)
+			src2 = pliBYTE_ONE(block_2)
+			src3 = pliBYTE_TWO(block_2)
+
+			Int0 = pliBYTE_ONE(Int_block_1)
+			Int1 = pliBYTE_TWO(Int_block_1)
+			Int2 = pliBYTE_ONE(Int_block_2)
+			Int3 = pliBYTE_TWO(Int_block_2)
+
+			prod_1 = 0
+			prod_2 = 0
+			prod_3 = 0
+			prod_4 = 0
+
+			buffer
+
+			overflow_flag = 0
+
+		prod_1 = src0*Int0
+
+		pliADDBUFFER(prod_1, prod_2)
+		pliFLUSH(prod_1)
+
+		buffer  = src1*Int0
+
+		pliADDDATA(buffer, prod_2)
+		prod_3 = pliBUFFER(buffer) + pliBUFFER(prod_2)
+		pliFLUSH(prod_2)
+
+		buffer  = src0*Int1
+
+		pliADDDATA(buffer, prod_2)
+		prod_3 += pliBUFFER(buffer) + pliBUFFER(prod_2)
+		pliADDBUFFER(prod_3, prod_4)
+
+		pliFLUSH(prod_2)
+		pliFLUSH(prod_3)
+
+		if(overflow_flag || !(mode & OVERFLOW_EXCEPTION))
+
+			buffer  = src2*Int0
+
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
+
+			buffer  = src1*Int1
+
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
+
+			buffer  = src0*Int2
+
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
+
+		else
+			buffer  = src2*Int0
+
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
+				overflow_flag = 1
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
+
+			buffer  = src1*Int1
+
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
+				overflow_flag = 1
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
+
+			buffer  = src0*Int2
+
+			pliADDDATA(buffer, prod_3)
+			prod_4 += pliBUFFER(buffer) + pliBUFFER(prod_3)
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
+				overflow_flag = 1
+			pliFLUSH(prod_3)
+			pliFLUSH(prod_4)
+
+		if(overflow_flag || !(mode & OVERFLOW_EXCEPTION))
+			prod_4 += pliDATA(src3*Int0)
+			prod_4 += pliDATA(src2*Int1)
+			prod_4 += pliDATA(src1*Int2)
+			prod_4 += pliDATA(src0*Int3)
+
+			pliFLUSH(prod_4)
+
+		else
+
+			prod_4 += src3*Int0
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
+				overflow_flag = 1
+
+			prod_4 += src2*Int1
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
+				overflow_flag = 1
+
+			prod_4 += src1*Int2
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
+				overflow_flag = 1
+
+			prod_4 += src0*Int3
+			if(!overflow_flag && (pliBUFFER(prod_4) != 0))
+				overflow_flag = 1
+
+		if(!overflow_flag && (mode & OVERFLOW_EXCEPTION))
+			overflow_flag = ( (src3 != 0) && ( (Int3 != 0) || (Int2 != 0) || (Int1 != 0) )) || \
+							( (src2 != 0) && ( (Int3 != 0) && (Int2 != 0) ) ) || \
+							( (src1 != 0) && (Int3 != 0) )
+
+		_SetBlock(1, prod_1 | pliBYTE_ONE_SHIFTED(prod_2) )
+		_SetBlock(2, prod_3 | pliBYTE_ONE_SHIFTED(prod_4) )
+
+		if(overflow_flag && (mode & OVERFLOW_EXCEPTION))
+			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+		return src
+
+	proc/operator/(...)
+		var
+			list
+				Processed = _ProcessArguments(args)
+				D = _AlgorithmD(Processed[1], Processed[2])
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
+			pif_LongInt/Unsigned32/Quot = new src.type
+#else
+			LongInt/Unsigned32/Quot = new src.type
+#endif
+
+		switch(D[1])
+
+			if(1)
+				Quot._SetBlock(2, 0                                )
+				Quot._SetBlock(1, D[2]                             )
+
+			if(2)
+				Quot._SetBlock(2, 0                                )
+				Quot._SetBlock(1, D[3] | pliBYTE_ONE_SHIFTED(D[2]) )
+
+			if(3)
+				Quot._SetBlock(2, D[2])
+				Quot._SetBlock(1, D[4] | pliBYTE_ONE_SHIFTED(D[3]) )
+
+			if(4)
+				Quot._SetBlock(2, D[3] | pliBYTE_ONE_SHIFTED(D[2]) )
+				Quot._SetBlock(1, D[5] | pliBYTE_ONE_SHIFTED(D[4]) )
+
+		return Quot
+
+	proc/operator/=(...)
+		var
+			list
+				Processed = _ProcessArguments(args)
+				D = _AlgorithmD(Processed[1], Processed[2])
+
+		switch(D[1])
+
+			if(1)
+				_SetBlock(2, 0                                )
+				_SetBlock(1, D[2]                             )
+
+			if(2)
+				_SetBlock(2, 0                                )
+				_SetBlock(1, D[3] | pliBYTE_ONE_SHIFTED(D[2]) )
+
+			if(3)
+				_SetBlock(2, D[2])
+				_SetBlock(1, D[4] | pliBYTE_ONE_SHIFTED(D[3]) )
+
+			if(4)
+				_SetBlock(2, D[3] | pliBYTE_ONE_SHIFTED(D[2]) )
+				_SetBlock(1, D[5] | pliBYTE_ONE_SHIFTED(D[4]) )
+
+		return src
+
+	proc/operator%(...)
+		var
+			// Get the data from _AlgorithmD
+			list
+				Processed = _ProcessArguments(args)
+				D = _AlgorithmD(Processed[1], Processed[2])
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
+			pif_LongInt/Unsigned32/Rem = new src.type
+#else
+			LongInt/Unsigned32/Rem = new src.type
+#endif
+
+		var
+			byte_1 = 0
+			byte_2 = 0
+			byte_3 = 0
+			byte_4 = 0
+
+			adj = D[13]
+
+		switch(D[11])
+			if(0)
+				switch(D[12])
+
+					if(1)
+						byte_4 = D[7]
+					if(2)
+						byte_3 = D[7]
+						byte_4 = D[8]
+					if(3)
+						byte_2 = D[7]
+						byte_3 = D[8]
+						byte_4 = D[9]
+					if(4)
+						byte_1 = D[7]
+						byte_2 = D[8]
+						byte_3 = D[9]
+						byte_4 = D[10]
+
+			if(1)
+
+				switch(D[12])
+
+					if(1)
+						byte_4 = D[8]
+					if(2)
+						byte_3 = D[8]
+						byte_4 = D[9]
+					if(3)
+						byte_2 = D[8]
+						byte_3 = D[9]
+						byte_4 = D[10]
+
+			if(2)
+
+				switch(D[12])
+
+					if(1)
+						byte_4 = D[9]
+					if(2)
+						byte_3 = D[9]
+						byte_4 = D[10]
+
+			if(3)
+				byte_4 = D[10]
+
+		var
+			q0
+			q1
+			q2
+			q3
+
+		q0 = pliFLOOR(byte_1 / adj)
+		byte_1 -= adj*q0
+
+		q1 = pliFLOOR( (byte_1*256 + byte_2) / adj)
+		byte_1 = (pliBYTE_ONE_SHIFTED(byte_1) | byte_2) - (adj*q1)
+		byte_2 = pliDATA(byte_1)
+
+		q2 = pliFLOOR( (byte_2*256 + byte_3) / adj)
+		byte_2 = (pliBYTE_ONE_SHIFTED(byte_2) | byte_3) - (adj*q2)
+		byte_3 = pliDATA(byte_2)
+
+		q3 = pliFLOOR( (byte_3*256 + byte_4) / adj)
+
+		Rem._SetBlock(2, pliBYTE_ONE_SHIFTED(q0) | q1)
+		Rem._SetBlock(1, pliBYTE_ONE_SHIFTED(q2) | q3)
+
+		return Rem
+
+	proc/operator%=(...)
+		var
+			list
+				Processed = _ProcessArguments(args)
+				D = _AlgorithmD(Processed[1], Processed[2])
+
+		var
+			byte_1 = 0
+			byte_2 = 0
+			byte_3 = 0
+			byte_4 = 0
+
+			adj = D[13]
+
+		switch(D[11])
+			if(0)
+				switch(D[12])
+
+					if(1)
+						byte_4 = D[7]
+					if(2)
+						byte_3 = D[7]
+						byte_4 = D[8]
+					if(3)
+						byte_2 = D[7]
+						byte_3 = D[8]
+						byte_4 = D[9]
+					if(4)
+						byte_1 = D[7]
+						byte_2 = D[8]
+						byte_3 = D[9]
+						byte_4 = D[10]
+
+			if(1)
+				switch(D[12])
+
+					if(1)
+						byte_4 = D[8]
+					if(2)
+						byte_3 = D[8]
+						byte_4 = D[9]
+					if(3)
+						byte_2 = D[8]
+						byte_3 = D[9]
+						byte_4 = D[10]
+
+			if(2)
+				switch(D[12])
+
+					if(1)
+						byte_4 = D[9]
+					if(2)
+						byte_3 = D[9]
+						byte_4 = D[10]
+
+			if(3)
+				byte_4 = D[10]
+
+		var
+			q0
+			q1
+			q2
+			q3
+
+		q0 = pliFLOOR(byte_1 / adj)
+		byte_1 -= adj*q0
+
+		q1 = pliFLOOR( (byte_1*256 + byte_2) / adj)
+		byte_1 = (pliBYTE_ONE_SHIFTED(byte_1) | byte_2) - (adj*q1)
+		byte_2 = pliDATA(byte_1)
+
+		q2 = pliFLOOR( (byte_2*256 + byte_3) / adj)
+		byte_2 = (pliBYTE_ONE_SHIFTED(byte_2) | byte_3) - (adj*q2)
+		byte_3 = pliDATA(byte_2)
+
+		q3 = pliFLOOR( (byte_3*256 + byte_4) / adj)
+
+		_SetBlock(2, pliBYTE_ONE_SHIFTED(q0) | q1)
+		_SetBlock(1, pliBYTE_ONE_SHIFTED(q2) | q3)
+
+		return src
+
+	proc/operator++()
+		var
+			B1 = 0
+			B2 = 0
+
+		B1 = pliBYTE_ONE(block_1) + 1
+		B2 = pliBYTE_TWO(block_1) + pliBUFFER(B1)
+
+		_SetBlock(1, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
+
+		B1 = pliBYTE_ONE(block_2) + pliBUFFER(B2)
+		B2 = pliBYTE_TWO(block_2) + pliBUFFER(B1)
+
+		_SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
+
+		if( (pliBUFFER(B2) != 0) && (mode & OVERFLOW_EXCEPTION) )
+			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+		return src
+
+	proc/operator--()
+		var
+			B1 = 0
+			B2 = 0
+
+		B1 = pliBYTE_ONE(block_1) + 0x00FF
+		B2 = pliBYTE_TWO(block_1) + pliBUFFER(B1) + 0x00FF
+
+		_SetBlock(1, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
+
+		B1 = pliBYTE_ONE(block_2) + pliBUFFER(B2) + 0x00FF
+		B2 = pliBYTE_TWO(block_2) + pliBUFFER(B1) + 0x00FF
+
+		_SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
+
+		if( (pliBUFFER(B2) == 0) && (mode & OVERFLOW_EXCEPTION) )
+			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+		return src
+
+	proc/operator**(n)
+		if(!isnum(n) || (round(n) != n))
+			// n is either non-numeric or a non-integer, so as per the pif_Arithmetic protocol
+			// specification we throw this exception.
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
+			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
+
+		if(n < 0)
+			// n is negative, so by the protocl we throw the following exception.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
+			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#endif
+
+		if(n == 2)
+
+			// Here, the code branches in two ways. If n = 2, we have the guts for the Square()
+			// method. This allows for a considerable speed-up, and squaring is by far the most
+			// common exponent.
+
+			var
+				src0 = pliBYTE_ONE(block_1)
+				src1 = pliBYTE_TWO(block_1)
+				src2 = pliBYTE_ONE(block_2)
+				src3 = pliBYTE_TWO(block_2)
+
+				byte_1 = 0
+				byte_2 = 0
+				byte_3 = 0
+				byte_4 = 0
+
+				buffer
+
+				overflow_flag = 0
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
+				pif_LongInt/Unsigned32/Square = new src.type
+#else
+				LongInt/Unsigned32/Square = new src.type
+#endif
+
+			byte_1 = src0*src0
+
+			pliADDBUFFER(byte_1, byte_2)
+			pliFLUSH(byte_1)
+
+			buffer = src0*src1
+
+			pliADDDATA_T2(buffer, byte_2)
+			byte_3 = pliBUFFER(byte_2) + pliBUFFER_T2(buffer)
+			pliADDBUFFER(byte_3, byte_4)
+
+			pliFLUSH(byte_2)
+			pliFLUSH(byte_3)
+
+			if(overflow_flag || !(mode & OVERFLOW_EXCEPTION))
+				buffer = src1*src1
+				pliADDDATA(buffer, byte_3)
+				byte_4 += pliBUFFER(byte_3) + pliBUFFER(buffer)
+				pliFLUSH(byte_3)
+				pliFLUSH(byte_4)
+
+				buffer = src0*src2
+				pliADDDATA_T2(buffer, byte_3)
+				byte_4 += pliBUFFER(byte_3) + pliBUFFER_T2(buffer)
+				pliFLUSH(byte_3)
+				pliFLUSH(byte_4)
+
+			else
+				buffer = src1*src1
+				pliADDDATA(buffer, byte_3)
+				byte_4 += pliBUFFER(byte_3) + pliBUFFER(buffer)
+				if(!overflow_flag && (pliBUFFER(byte_4) != 0))
+					overflow_flag = 1
+
+				pliFLUSH(byte_3)
+				pliFLUSH(byte_4)
+
+				buffer = src0*src2
+				pliADDDATA_T2(buffer, byte_3)
+				byte_4 += pliBUFFER(byte_3) + pliBUFFER_T2(buffer)
+				if(!overflow_flag && (pliBUFFER(byte_4) != 0))
+					overflow_flag = 1
+
+				pliFLUSH(byte_3)
+				pliFLUSH(byte_4)
+
+			if(overflow_flag || !(mode & OVERFLOW_EXCEPTION))
+				byte_4 += pliDATA_T2(src0*src3)
+				if(!overflow_flag && (pliBUFFER(byte_4) != 0))
+					overflow_flag = 1
+
+				byte_4 += pliDATA_T2(src1*src2)
+				if(!overflow_flag && (pliBUFFER(byte_4) != 0))
+					overflow_flag = 1
+
+			if(!overflow_flag && (mode & OVERFLOW_EXCEPTION))
+				overflow_flag = (src3 != 0) || (src2 != 0)
+
+			Square._SetBlock(1, byte_1 | pliBYTE_ONE_SHIFTED(byte_2) )
+			Square._SetBlock(2, byte_3 | pliBYTE_ONE_SHIFTED(byte_4) )
+
+			if(overflow_flag && (mode & OVERFLOW_EXCEPTION))
+				throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+
+			return Square
+
+		else
+
+			// If it's not equal to 2, then we use the Power() method defined on the
+			// /pif_LongInt class.
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
+			var/pif_LongInt/Unsigned32
+#else
+			var/LongInt/Unsigned32
+#endif
+				Int = new src.type(1)
+				Tracker = new src.type(src)
+
+			Int.SetModeFlag(OVERFLOW_EXCEPTION, src.mode & OVERFLOW_EXCEPTION)
+
+			while(n != 0)
+				if((n & 0x0001) == 1)
+					Int = Int.Multiply(Tracker)
+
+				Tracker = Tracker.Square()
+				n >>= 1
+
+			return Int
+
+	proc/operator~()
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
+		var/pif_LongInt/Unsigned32/Int = new src.type(src)
+#else
+		var/LongInt/Unsigned32/Int = new src.type(src)
+#endif
+
+		Int.block_1 = ~Int.block_1
+		Int.block_2 = ~Int.block_2
+
+		return Int
+
+	proc/operator&(...)
+		var
+			list/Processed = _ProcessArguments(args)
+
+			b1 = Processed[1]
+			b2 = Processed[2]
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
+			pif_LongInt/Unsigned32/Int = new src.type(src)
+#else
+			LongInt/Unsigned32/Int = new src.type(src)
+#endif
+
+		Int.block_1 &= b1
+		Int.block_2 &= b2
+
+		return Int
+
+	proc/operator&=(...)
+		var
+			list/Processed = _ProcessArguments(args)
+
+			b1 = Processed[1]
+			b2 = Processed[2]
+
+		block_1 &= b1
+		block_2 &= b2
+
+		return src
+
+	proc/operator|(...)
+		var
+			list/Processed = _ProcessArguments(args)
+
+			b1 = Processed[1]
+			b2 = Processed[2]
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
+			pif_LongInt/Unsigned32/Int = new src.type(src)
+#else
+			LongInt/Unsigned32/Int = new src.type(src)
+#endif
+
+		Int.block_1 |= b1
+		Int.block_2 |= b2
+
+		return Int
+
+	proc/operator|=(...)
+		var
+			list/Processed = _ProcessArguments(args)
+
+			b1 = Processed[1]
+			b2 = Processed[2]
+
+		block_1 |= b1
+		block_2 |= b2
+
+		return src
+
+	proc/operator^(...)
+		var
+			list/Processed = _ProcessArguments(args)
+
+			b1 = Processed[1]
+			b2 = Processed[2]
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
+			pif_LongInt/Unsigned32/Int = new src.type(src)
+#else
+			LongInt/Unsigned32/Int = new src.type(src)
+#endif
+
+		Int.block_1 ^= b1
+		Int.block_2 ^= b2
+
+		return Int
+
+	proc/operator^=(...)
+		var
+			list/Processed = _ProcessArguments(args)
+
+			b1 = Processed[1]
+			b2 = Processed[2]
+
+		block_1 ^= b1
+		block_2 ^= b2
+
+		return src
+
+	proc/operator<<(n)
+		if(!isnum(n) || (round(n) != n))
+			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+		if(n < 0)
+			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+
+		var
+			hold
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
+			var/pif_LongInt/Unsigned32/Int = new src.type(src)
+#else
+			var/LongInt/Unsigned32/Int = new src.type(src)
+#endif
+
+		if(n >= BitLength())
+			Int.block_1 = 0
+			Int.block_2 = 0
+
+		else
+			if(n <= 16)
+				hold = Int.block_1 >> (16 - n)
+
+				Int.block_1 = (Int.block_1 << n) & 0xFFFF
+				Int.block_2 = ((Int.block_2 << n) | hold) & 0xFFFF
+
+			else
+				Int.block_2 = (Int.block_1 << (n-16)) & 0xFFFF
+				Int.block_1 = 0
+
+		return Int
+
+	proc/operator<<=(n)
+		if(!isnum(n) || (round(n) != n))
+			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+		if(n < 0)
+			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+
+		var
+			// Holds the overflow from block_1 into block_2.
+			hold
+
+		if(n >= BitLength())
+			block_1 = 0
+			block_2 = 0
+
+		else
+			if(n <= 16)
+				hold = block_1 >> (16 - n)
+
+				block_1 = (block_1 << n) & 0xFFFF
+				block_2 = ((block_2 << n) | hold) & 0xFFFF
+
+			else
+				block_2 = (block_1 << (n-16)) & 0xFFFF
+				block_1 = 0
+
+		return src
+
+	proc/operator>>(n)
+		if(!isnum(n) || (round(n) != n))
+			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+		if(n < 0)
+			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+
+		var
+			// Holds the overflow from block_1 into block_2.
+			hold
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
+			var/pif_LongInt/Unsigned32/Int = new src.type(src)
+#else
+			var/LongInt/Unsigned32/Int = new src.type(src)
+#endif
+
+		if(n >= BitLength())
+			Int.block_1 = 0
+			Int.block_2 = 0
+
+		else
+			if(n <= 16)
+				hold = Int.block_2 << (16 - n)
+
+				Int.block_1 = ((Int.block_1 >> n) | hold) & 0xFFFF
+				Int.block_2 = (Int.block_2 >> n) & 0xFFFF
+
+			else
+				Int.block_1 = (Int.block_2 >> (n-16)) & 0xFFFF
+				Int.block_2 = 0
+
+		return Int
+
+	proc/operator>>=(n)
+		if(!isnum(n) || (round(n) != n))
+			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+		if(n < 0)
+			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+
+		var
+			// Holds the overflow from block_1 into block_2.
+			hold
+
+		if(n >= BitLength())
+			block_1 = 0
+			block_2 = 0
+
+		else
+			if(n <= 16)
+				hold = block_2 << (16 - n)
+
+				block_1 = ((block_1 >> n) | hold) & 0xFFFF
+				block_2 = (block_2 >> n) & 0xFFFF
+
+			else
+				block_1 = (block_2 >> (n-16)) & 0xFFFF
+				block_2 = 0
+
+		return src
+
+	proc/operator~=(...)
+		return Compare(arglist(args)) ==  0
+	proc/operator~!(...)
+		return Compare(arglist(args)) !=  0
+	proc/operator>(...)
+		return Compare(arglist(args)) ==  1
+	proc/operator>=(...)
+		return Compare(arglist(args)) != -1
+	proc/operator<(...)
+		return Compare(arglist(args)) == -1
+	proc/operator<=(...)
+		return Compare(arglist(args)) !=  1
+
+#endif

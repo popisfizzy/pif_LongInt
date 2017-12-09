@@ -1,7 +1,7 @@
 /**
  ** pif_LongInt
- **   Version: b1.1.1.20170806
- **   Release Date: August 6, 2017
+ **   Version: b1.1.2.201712??
+ **   Release Date: December ??, 2017
  **
  ***************************************************************************************************
  ***************************************************************************************************
@@ -36,6 +36,12 @@ unsigned integers are currently available in the beta.
 
   3. Release Notes
   ----------------------------------------------------
+
+  Version b1.1.2.201712?? [unreleased]
+
+    - The library now supports the newly-implemented overloaded operators feature. This means that
+      the integer classes can be used much more like BYOND's built in numeric types, without having
+      to make explicit method calls. This change requires at least BYOND v512 to work.
 
   Version b1.1.1.20170806
 
@@ -92,9 +98,13 @@ unsigned integers are currently available in the beta.
   ----------------------------------------------------
 
   - Write up complete documentation for the library.
-  - Implement classes for both signed and unsigned triple and quadruple-precision integers.
+  - Implement classes for both signed and unsigned 48-bit and 64-bit integers..
   - Set up a preprocessor flag that toggles allowing negative remainders or having only positive
     remainders. Currently, negative remainders are allowed to appear.
+  - Finish implenting overloaded operators in the Signed32 class.
+  - Get the #PIF_NOPREFIX_ setting working correctly.
+  - Set up a flag that disables overflow/underflow checking entirely, avoiding the processor cycles
+    that are currently dedicated to at least determining if the flag is on.
 
 ****************************************************************************************************
 ****************************************************************************************************/
