@@ -109,7 +109,11 @@ LongInt/Unsigned32
 							// data, then the object is too large to read in and we must throw an
 							// exception.
 							if(IntegerObject._GetBlock(i) != 0)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 								throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+								throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 					// Otherwise, just assign the relevant data to the list.
 					Data[1] = IntegerObject._GetBlock(1)
@@ -119,12 +123,20 @@ LongInt/Unsigned32
 					// If it's some other type of object, we'll assume it's something that
 					// implements the pif_Arithmetic protocol.
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 					var/pif_Arithmetic/pif_ArithmeticObject = arguments[1]
+#else
+					var/Arithmetic/pif_ArithmeticObject = arguments[1]
+#endif
 
 					if(!hascall(pif_ArithmeticObject, "Length") || !hascall(pif_ArithmeticObject, "_GetBlock"))
 						// If it doesn't conform to the pif_Arithmetic protocol, we throw the
 						// required exception.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 						throw new /pif_Arithmetic/ProtocolNonConformingObjectException(__FILE__, __LINE__)
+#else
+						throw new /Arithmetic/ProtocolNonConformingObjectException(__FILE__, __LINE__)
+#endif
 
 					// Otherwise, we do the same as above.
 
@@ -134,7 +146,11 @@ LongInt/Unsigned32
 						var/L = pif_ArithmeticObject.Length()
 						for(var/i = 3, i <= L, i ++)
 							if(pif_ArithmeticObject._GetBlock(i) != 0)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 								throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+								throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 					Data[1] = pif_ArithmeticObject._GetBlock(1)
 					Data[2] = pif_ArithmeticObject._GetBlock(2)
@@ -191,14 +207,26 @@ LongInt/Unsigned32
 							block_2
 
 						if(!isnum(Integer))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 							throw new /pif_Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+#else
+							throw new /Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+#endif
 						else if(round(Integer) != Integer)
 							// Must be an integer.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 							throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+							throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 
 						if(Integer < 0)
 							// If it's less than zero, then we throw the prescribed exception.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 							throw new /pif_Arithmetic/NegativeInvalidPositionException(__FILE__, __LINE__)
+#else
+							throw new /Arithmetic/NegativeInvalidPositionException(__FILE__, __LINE__)
+#endif
 
 						// Any other value we'll interpret as an integer. Only values in the range
 						// [0, 16777215] are guaranteed to be accurate; above that range, it may not
@@ -219,9 +247,17 @@ LongInt/Unsigned32
 							block_2 = arguments[arguments.len-1]
 
 						if(!isnum(block_1) || !isnum(block_2))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 							throw new /pif_Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+#else
+							throw new /Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+#endif
 						else if( (round(block_1) != block_1) || (round(block_2) != block_2) )
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 							throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+							throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 
 						// Because this class is unsigned, we will interpret negative values as
 						// bitstrings.
@@ -240,14 +276,26 @@ LongInt/Unsigned32
 							var/block = Args[i]
 
 							if(!isnum(block))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 								throw new /pif_Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+#else
+								throw new /Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+#endif
 							else if(round(block) != block)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 								throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+								throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 							else if((mode & OVERFLOW_EXCEPTION) && (block != 0))
 								// If there is non-zero data and OVERFLOW_EXCEPTION mode is enabled,
 								// then the incoming data is too large to read in and we must throw
 								// the exception.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 								throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+								throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 			/*
 
@@ -292,11 +340,19 @@ LongInt/Unsigned32
 
 					if(length(String) == 0)
 						// Zero-length strings are not allowed.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 						throw new /pif_Arithmetic/InvalidStringArgumentException(__FILE__, __LINE__)
+#else
+						throw new /Arithmetic/InvalidStringArgumentException(__FILE__, __LINE__)
+#endif
 
 					if(findtext(String, "-", 1, 2))
 						// Strings encoding negative numbers are not allowed in unsigned integers.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 						throw new /pif_Arithmetic/NegativeInvalidPositionException(__FILE__, __LINE__)
+#else
+						throw new /Arithmetic/NegativeInvalidPositionException(__FILE__, __LINE__)
+#endif
 
 					if(findtextEx(String, "0b", 1, 3))
 						/*
@@ -324,7 +380,11 @@ LongInt/Unsigned32
 
 							if( (c != 0) && (c != 1) )
 								// If we've encountered an invalid character, throw an exception.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 								throw new /pif_Arithmetic/InvalidStringEncodingException(__FILE__, __LINE__)
+#else
+								throw new /Arithmetic/InvalidStringEncodingException(__FILE__, __LINE__)
+#endif
 
 							if((length - i) < 16)
 								Tracker.Add(0x0000, c << (length - i))
@@ -340,7 +400,11 @@ LongInt/Unsigned32
 								else if(c != 0)
 									// Otherwise, wait until we find a non-zero term and throw the
 									// exception.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 									throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+									throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 						Data[1] = Tracker._GetBlock(1)
 						Data[2] = Tracker._GetBlock(2)
@@ -396,7 +460,11 @@ LongInt/Unsigned32
 
 							if( (c < HEX_ZERO) || (c > HEX_FIFTEEN) )
 								// If we've encountered an invalid character, throw an exception.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 								throw new /pif_Arithmetic/InvalidStringEncodingException(__FILE__, __LINE__)
+#else
+								throw new /Arithmetic/InvalidStringEncodingException(__FILE__, __LINE__)
+#endif
 
 							if((length - i) < 4)
 								// If i is in the range [0, 4) then we can still write to the first
@@ -418,14 +486,22 @@ LongInt/Unsigned32
 								else if(c != HEX_ZERO)
 									// Otherwise, wait until we find a non-zero term and throw the
 									// exception.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 									throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+									throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 						Data[1] = Tracker._GetBlock(1)
 						Data[2] = Tracker._GetBlock(2)
 
 					else if(findtext(String, regex("0\[^0-9]"), 1, 3))
 						// We found another prefix but one that is unsupported.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 						throw new /pif_Arithmetic/InvalidStringPrefixException(__FILE__, __LINE__)
+#else
+						throw new /Arithmetic/InvalidStringPrefixException(__FILE__, __LINE__)
+#endif
 
 					else
 						// If only the character 0-9 show up in the string, then it's a valid
@@ -467,7 +543,11 @@ LongInt/Unsigned32
 
 							if((c < 0) || (c > 9))
 								// If we've encountered an invalid character, throw an exception.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 								throw new /pif_Arithmetic/InvalidStringEncodingException(__FILE__, __LINE__)
+#else
+								throw new /Arithmetic/InvalidStringEncodingException(__FILE__, __LINE__)
+#endif
 
 							else if(c != 0)
 								// If c is non-zero, then compute the corresponding value, store it
@@ -503,14 +583,26 @@ LongInt/Unsigned32
 						block_2
 
 					if(!isnum(Integer))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 						throw new /pif_Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+#else
+						throw new /Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+#endif
 					else if(round(Integer) != Integer)
 						// Must be an integer.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 						throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+						throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 
 					if(Integer < 0)
 						// If it's less than zero, then we throw the prescribed exception.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 						throw new /pif_Arithmetic/NegativeInvalidPositionException(__FILE__, __LINE__)
+#else
+						throw new /Arithmetic/NegativeInvalidPositionException(__FILE__, __LINE__)
+#endif
 
 					// Any other value we'll interpret as an integer. Only values in the range [0,
 					// 16777215] are guaranteed to be accurate; above that range, it may not be
@@ -530,7 +622,11 @@ LongInt/Unsigned32
 			*/
 
 				else
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 					throw new /pif_Arithmetic/InvalidArgumentFormatException(__FILE__, __LINE__)
+#else
+					throw new /Arithmetic/InvalidArgumentFormatException(__FILE__, __LINE__)
+#endif
 
 			/*
 
@@ -593,9 +689,17 @@ LongInt/Unsigned32
 					block_2 = arguments[arguments.len-1]
 
 				if(!isnum(block_1) || !isnum(block_2))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 					throw new /pif_Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+#else
+					throw new /Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+#endif
 				else if( (round(block_1) != block_1) || (round(block_2) != block_2) )
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 					throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+					throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 
 				// Because this class is unsigned, we will interpret negative values as bitstrings.
 				if(block_1 < 0)
@@ -613,14 +717,26 @@ LongInt/Unsigned32
 					var/block = arguments[i]
 
 					if(!isnum(block))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 						throw new /pif_Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+#else
+						throw new /Arithmetic/NonNumericInvalidPositionException(__FILE__, __LINE__)
+#endif
 					else if(round(block) != block)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 						throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+						throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 					else if((mode & OVERFLOW_EXCEPTION) && (block != 0))
 						// If there is non-zero data and OVERFLOW_EXCEPTION mode is enabled, then
 						// the incoming data is too large to read in and we must throw the
 						// exception.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 						throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+						throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 			return Data
 
@@ -630,21 +746,45 @@ LongInt/Unsigned32
 
 	_GetBlock(i)
 		if(!isnum(i))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 		if(i <= 0)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NonPositiveIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NonPositiveIntegerException(__FILE__, __LINE__)
+#endif
 		if(i > Length)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OutOfBoundsException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OutOfBoundsException(__FILE__, __LINE__)
+#endif
 
 		return (i == 1) ? block_1 : block_2
 
 	_SetBlock(i, j)
 		if(!isnum(i) || !isnum(j))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 		if(i <= 0)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NonPositiveIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NonPositiveIntegerException(__FILE__, __LINE__)
+#endif
 		if(i > Length)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OutOfBoundsException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OutOfBoundsException(__FILE__, __LINE__)
+#endif
 
 		if(i == 1)
 			block_1 = j
@@ -708,7 +848,11 @@ LongInt/Unsigned32
 			// If B2's buffer is not equal to zero, then we overflowed and need to throw the
 			// OverflowException if it's flag set.
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 		return Sum
 
@@ -766,7 +910,11 @@ LongInt/Unsigned32
 			// If B2's buffer is equal to zero, then there was a negative overflow. Thus, we need to
 			// possibly throw the OverflowException.
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 		return Diff
 
@@ -1012,7 +1160,11 @@ LongInt/Unsigned32
 
 		if(overflow_flag && (mode & OVERFLOW_EXCEPTION))
 			// If overflow occured and we need to report it, then throw the OverflowException.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 		return Prod
 
@@ -1967,7 +2119,11 @@ LongInt/Unsigned32
 			// If B2's buffer is not equal to zero, then we overflowed and need to throw the
 			// OverflowException if it's flag set.
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 		return Sum
 
@@ -2010,7 +2166,11 @@ LongInt/Unsigned32
 			// If B2's buffer is equal to zero, then there was a negative overflow. Thus, we need to
 			// possibly throw the OverflowException.
 
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 		return Diff
 
@@ -2168,7 +2328,11 @@ LongInt/Unsigned32
 
 		if(overflow_flag && (mode & OVERFLOW_EXCEPTION))
 			// If overflow occured and we need to report it, then throw the OverflowException.
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 		return Square
 
@@ -2288,9 +2452,17 @@ LongInt/Unsigned32
 
 	BitshiftLeft(n)
 		if(!isnum(n) || (round(n) != n))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 		if(n < 0)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#endif
 
 		var
 			// Holds the overflow from block_1 into block_2.
@@ -2330,9 +2502,17 @@ LongInt/Unsigned32
 
 	BitshiftLeftRotate(n)
 		if(!isnum(n) || (round(n) != n))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 		if(n < 0)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#endif
 
 		var
 			// Holds the overflow from block_1 into block_2 and from block_2
@@ -2377,9 +2557,17 @@ LongInt/Unsigned32
 
 	BitshiftRight(n)
 		if(!isnum(n) || (round(n) != n))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 		if(n < 0)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#endif
 
 		var
 			// Holds the overflow from block_1 into block_2.
@@ -2419,9 +2607,18 @@ LongInt/Unsigned32
 
 	BitshiftRightRotate(n)
 		if(!isnum(n) || (round(n) != n))
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 		if(n < 0)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#endif
 
 		var
 			// Holds the overflow from block_1 into block_2 and from block_2 into block_2,
@@ -2468,11 +2665,23 @@ LongInt/Unsigned32
 
 	Bit(p)
 		if(!isnum(p) || (round(p) != p))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 		if(p < 0)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#endif
 		if(p > (BitLength() - 1))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OutOfBoundsException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OutOfBoundsException(__FILE__, __LINE__)
+#endif
 
 		if(p < 16)
 			return (block_1 >> p) & 0x0001
@@ -2820,7 +3029,11 @@ LongInt/Unsigned32
 		Sum._SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
 		if( (pliBUFFER(B2) != 0) && (mode & OVERFLOW_EXCEPTION) )
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 		return Sum
 
@@ -2846,7 +3059,11 @@ LongInt/Unsigned32
 		_SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
 		if( (pliBUFFER(B2) != 0) && (mode & OVERFLOW_EXCEPTION) )
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 		return src
 
@@ -2878,7 +3095,11 @@ LongInt/Unsigned32
 		Diff._SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
 		if( (pliBUFFER(B2) == 0) && (mode & OVERFLOW_EXCEPTION) )
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 		return Diff
 
@@ -2904,7 +3125,11 @@ LongInt/Unsigned32
 		_SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
 		if( (pliBUFFER(B2) == 0) && (mode & OVERFLOW_EXCEPTION) )
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 		return src
 
@@ -3047,7 +3272,11 @@ LongInt/Unsigned32
 		Prod._SetBlock(2, prod_3 | pliBYTE_ONE_SHIFTED(prod_4) )
 
 		if(overflow_flag && (mode & OVERFLOW_EXCEPTION))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 		return Prod
 
@@ -3184,7 +3413,11 @@ LongInt/Unsigned32
 		_SetBlock(2, prod_3 | pliBYTE_ONE_SHIFTED(prod_4) )
 
 		if(overflow_flag && (mode & OVERFLOW_EXCEPTION))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 		return src
 
@@ -3435,7 +3668,11 @@ LongInt/Unsigned32
 		_SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
 		if( (pliBUFFER(B2) != 0) && (mode & OVERFLOW_EXCEPTION) )
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 		return src
 
@@ -3455,7 +3692,11 @@ LongInt/Unsigned32
 		_SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
 		if( (pliBUFFER(B2) == 0) && (mode & OVERFLOW_EXCEPTION) )
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 		return src
 
@@ -3567,7 +3808,11 @@ LongInt/Unsigned32
 			Square._SetBlock(2, byte_3 | pliBYTE_ONE_SHIFTED(byte_4) )
 
 			if(overflow_flag && (mode & OVERFLOW_EXCEPTION))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 				throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+#else
+				throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+#endif
 
 			return Square
 
@@ -3699,9 +3944,17 @@ LongInt/Unsigned32
 
 	proc/operator<<(n)
 		if(!isnum(n) || (round(n) != n))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 		if(n < 0)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#endif
 
 		var
 			hold
@@ -3731,9 +3984,17 @@ LongInt/Unsigned32
 
 	proc/operator<<=(n)
 		if(!isnum(n) || (round(n) != n))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 		if(n < 0)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#endif
 
 		var
 			// Holds the overflow from block_1 into block_2.
@@ -3758,9 +4019,17 @@ LongInt/Unsigned32
 
 	proc/operator>>(n)
 		if(!isnum(n) || (round(n) != n))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 		if(n < 0)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#endif
 
 		var
 			// Holds the overflow from block_1 into block_2.
@@ -3791,9 +4060,17 @@ LongInt/Unsigned32
 
 	proc/operator>>=(n)
 		if(!isnum(n) || (round(n) != n))
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NonIntegerException(__FILE__, __LINE__)
+#endif
 		if(n < 0)
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#else
+			throw new /Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
+#endif
 
 		var
 			// Holds the overflow from block_1 into block_2.

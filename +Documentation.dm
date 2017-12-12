@@ -42,6 +42,8 @@ unsigned integers are currently available in the beta.
     - The library now supports the newly-implemented overloaded operators feature. This means that
       the integer classes can be used much more like BYOND's built in numeric types, without having
       to make explicit method calls. This change requires at least BYOND v512 to work.
+    - Made the library compliant with the PIF_NOPREFIX_GENERAL preprocessor flag that's universal in
+      my libraries, and added a specific PIF_NOPREFIX_LONGINT flag.
 
   Version b1.1.1.20170806
 
@@ -102,7 +104,6 @@ unsigned integers are currently available in the beta.
   - Set up a preprocessor flag that toggles allowing negative remainders or having only positive
     remainders. Currently, negative remainders are allowed to appear.
   - Finish implenting overloaded operators in the Signed32 class.
-  - Get the #PIF_NOPREFIX_ setting working correctly.
   - Set up a flag that disables overflow/underflow checking entirely, avoiding the processor cycles
     that are currently dedicated to at least determining if the flag is on.
 
