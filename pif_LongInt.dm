@@ -82,6 +82,8 @@ LongInt
 	 */
 
 	proc
+		ToFloat()
+
 		// pif_LongInt also supports printing to quaternary, octal, and base-64
 		// in addition to what is required by the pif_Arithmetic protocol.
 

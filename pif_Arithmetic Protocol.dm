@@ -71,6 +71,7 @@
 ****************************************************************************************************/
 
 #ifndef PIF_ARITHMETIC_INCLUDED
+#define	PIF_ARITHMETIC_INCLUDED
 
 #if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 pif_Arithmetic

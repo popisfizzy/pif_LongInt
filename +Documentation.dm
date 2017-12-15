@@ -6,9 +6,9 @@
  ***************************************************************************************************
  ***************************************************************************************************
 
-pif_LongInt is a library that implements both signed and unsigned double, triple, and quadruple
-precision (32-bit, 48-bit, and 64-bit) integers. In this beta version, only 32-bit signed and
-unsigned integers are currently available in the beta.
+pif_LongInt is a library that implements signed and unsigned double, triple, and quadruple precision
+(32-bit, 48-bit, and 64-bit) integers. In this beta version, only 32-bit signed and unsigned
+integers are available.
 
  +------------------------+
  |                        |
@@ -44,6 +44,8 @@ unsigned integers are currently available in the beta.
       to make explicit method calls. This change requires at least BYOND v512 to work.
     - Made the library compliant with the PIF_NOPREFIX_GENERAL preprocessor flag that's universal in
       my libraries, and added a specific PIF_NOPREFIX_LONGINT flag.
+    - Added the ToFloat() method, which allows one to convert from a pif_LongInt object to BYOND's
+      floating point number representation.
 
   Version b1.1.1.20170806
 
@@ -103,7 +105,6 @@ unsigned integers are currently available in the beta.
   - Implement classes for both signed and unsigned 48-bit and 64-bit integers..
   - Set up a preprocessor flag that toggles allowing negative remainders or having only positive
     remainders. Currently, negative remainders are allowed to appear.
-  - Finish implenting overloaded operators in the Signed32 class.
   - Set up a flag that disables overflow/underflow checking entirely, avoiding the processor cycles
     that are currently dedicated to at least determining if the flag is on.
 

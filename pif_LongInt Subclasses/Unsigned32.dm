@@ -2815,7 +2815,11 @@ LongInt/Unsigned32
 		// Here only as a joke.
 
 		. = ""
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 		var/pif_LongInt/Int = new src.type(src)
+#else
+		var/LongInt/Int = new src.type(src)
+#endif
 		Int.SetModeFlag(NEW_OBJECT, 0)
 
 		while(!Int.IsZero())
@@ -2991,14 +2995,14 @@ LongInt/Unsigned32
 #else
 
 /*
- * Operator overloading methods. These are largely copied and pasted from the above methods,
- * with minor changes where necessary. Refer to the corresponding method above for documentation
- * (e.g. refer to the Add() method for operator+() and operator+=()), as I've removed the comments
- * for brevity, except to note other changes.
+ * Operator overloading methods. These are largely copied and pasted from the above methods, with
+ * minor changes where necessary. Refer to the corresponding method above for documentation (e.g.
+ * refer to the Add() method for operator+() and operator+=()), as I've removed the comments for
+ * brevity, except to note other changes.
  *
- * Throughout the following, the "plain" operators follow the behavior of NEW_OPERATOR flag (that
- * is, a new object is created), while the assignment operators (e.g., +=, -=, etc.) follow the
- * behavior of the OLD_OBJECT flag (the object is changed in place).
+ * Throughout the following, the "plain" operators follow the behavior of NEW_OPERATOR flag (that is,
+ * a new object is created), while the assignment operators (e.g., +=, -=, etc.) follow the behavior
+ * of the OLD_OBJECT flag (the object is changed in place).
  */
 
 	proc/operator+(...)
@@ -3071,8 +3075,8 @@ LongInt/Unsigned32
 		var
 			list/Processed = _ProcessArguments(args)
 
-			Int_block_1 = Processed[1] // Least significant.
-			Int_block_2 = Processed[2] // Most significant.
+			Int_block_1 = Processed[1]
+			Int_block_2 = Processed[2]
 
 #if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			pif_LongInt/Unsigned32/Diff = new src.type(src)
@@ -3084,7 +3088,7 @@ LongInt/Unsigned32
 			B1 = 0
 			B2 = 0
 
-		B1 = pliBYTE_ONE(block_1) + pliBYTE_ONE_N(Int_block_1) + 1 // Adding one for negation.
+		B1 = pliBYTE_ONE(block_1) + pliBYTE_ONE_N(Int_block_1) + 1
 		B2 = pliBYTE_TWO(block_1) + pliBYTE_TWO_N(Int_block_1) + pliBUFFER(B1)
 
 		Diff._SetBlock(1, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
@@ -3107,14 +3111,14 @@ LongInt/Unsigned32
 		var
 			list/Processed = _ProcessArguments(args)
 
-			Int_block_1 = Processed[1] // Least significant.
-			Int_block_2 = Processed[2] // Most significant.
+			Int_block_1 = Processed[1]
+			Int_block_2 = Processed[2]
 
 		var
 			B1 = 0
 			B2 = 0
 
-		B1 = pliBYTE_ONE(block_1) + pliBYTE_ONE_N(Int_block_1) + 1 // Adding one for negation.
+		B1 = pliBYTE_ONE(block_1) + pliBYTE_ONE_N(Int_block_1) + 1
 		B2 = pliBYTE_TWO(block_1) + pliBYTE_TWO_N(Int_block_1) + pliBUFFER(B1)
 
 		_SetBlock(1, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
@@ -3481,7 +3485,6 @@ LongInt/Unsigned32
 
 	proc/operator%(...)
 		var
-			// Get the data from _AlgorithmD
 			list
 				Processed = _ProcessArguments(args)
 				D = _AlgorithmD(Processed[1], Processed[2])
@@ -3712,14 +3715,13 @@ LongInt/Unsigned32
 #endif
 
 		if(n < 0)
-			// n is negative, so by the protocl we throw the following exception.
 #if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
 			throw new /pif_Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
 #else
 			throw new /Arithmetic/NegativeIntegerException(__FILE__, __LINE__)
 #endif
 
-		if(n == 2)
+		else if(n == 2)
 
 			// Here, the code branches in two ways. If n = 2, we have the guts for the Square()
 			// method. This allows for a considerable speed-up, and squaring is by far the most
@@ -3818,8 +3820,8 @@ LongInt/Unsigned32
 
 		else
 
-			// If it's not equal to 2, then we use the Power() method defined on the
-			// /pif_LongInt class.
+			// If it's not equal to 2, then we use the Power() method defined on the pif_LongInt
+			// class.
 
 #if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
 			var/pif_LongInt/Unsigned32
@@ -3997,7 +3999,6 @@ LongInt/Unsigned32
 #endif
 
 		var
-			// Holds the overflow from block_1 into block_2.
 			hold
 
 		if(n >= BitLength())
@@ -4032,7 +4033,6 @@ LongInt/Unsigned32
 #endif
 
 		var
-			// Holds the overflow from block_1 into block_2.
 			hold
 
 #if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
@@ -4073,7 +4073,6 @@ LongInt/Unsigned32
 #endif
 
 		var
-			// Holds the overflow from block_1 into block_2.
 			hold
 
 		if(n >= BitLength())
