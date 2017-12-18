@@ -740,6 +740,30 @@ LongInt/Unsigned32
 
 			return Data
 
+	ToFloat()
+		// Outputs the value of the data as a float. Because floating point numbers are only
+		// approximately accurate, this may not be the "true" value of the integer. As such,
+		// it's possible that converting to a float and back to an integer will result in a
+		// different value than was there originally.
+
+		return ((block_2 & 0x8000) >> 15) * 2147483648 + \
+			   ((block_2 & 0x4000) >> 14) * 1073741824 + \
+			   ((block_2 & 0x2000) >> 13) *  536870912 + \
+			   ((block_2 & 0x1000) >> 12) *  268435456 + \
+			   ((block_2 & 0x0800) >> 11) *  134217728 + \
+			   ((block_2 & 0x0400) >> 10) *   67108864 + \
+			   ((block_2 & 0x0200) >>  9) *   33554432 + \
+			   ((block_2 & 0x0100) >>  8) *   16777216 + \
+			   ((block_2 & 0x0080) >>  7) *    8388608 + \
+			   ((block_2 & 0x0040) >>  6) *    4194304 + \
+			   ((block_2 & 0x0020) >>  5) *    2097152 + \
+			   ((block_2 & 0x0010) >>  4) *    1048576 + \
+			   ((block_2 & 0x0008) >>  3) *     524288 + \
+			   ((block_2 & 0x0004) >>  2) *     262144 + \
+			   ((block_2 & 0x0002) >>  1) *     131072 + \
+			    (block_2 & 0x0001)        *      65536 + \
+			     block_1
+
 	/*
 	 * "Private" methods.
 	 */

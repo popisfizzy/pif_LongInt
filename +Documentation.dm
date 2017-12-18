@@ -1,7 +1,7 @@
 /**
  ** pif_LongInt
- **   Version: b1.1.2.201712??
- **   Release Date: December ??, 2017
+ **   Version: b1.1.2.20171217
+ **   Release Date: December 17, 2017
  **
  ***************************************************************************************************
  ***************************************************************************************************
@@ -47,8 +47,8 @@ integers are available.
   downsides in certain applications. This most often occurs when one needs perfectly precise
   integers: while floating point numbers have a larger *range*, they lose precision; if you have an
   integer larger than 16,777,216 or smaller than -16,777,216, they will be rounded to a power of 2
-  (though which power depends on how larger the number is. This can lead to strange things, such as
-  Dream Seeker telling you that 16,777,216.
+  (though which power depends on how larger the number is). This can lead to strange things, such as
+  Dream Seeker telling you that 16,777,216 + 1 = 16,777,216..
 
   This library provides an alternative, fixed-precision integers of a larger range than BYOND can
   handle natively. It also does this entirely in native DM code, without having to do any calls to
@@ -78,10 +78,9 @@ integers are available.
   64-bit integers use four floats.
 
   A larger number of bits is not inherently better. The larger the number, the slower the operations
-  are on it, and the more memory is being used up. If you don't expect your numberse to reach the
+  are on it, and the more memory is being used up. If you don't expect your numbers to reach the
   range given by an integer of a specific size (see section 3.3. below), it's probably better to use a
   smaller integer.
-
 
   3.3. Numerical range of data types
   ------------------------------------------
@@ -100,7 +99,7 @@ integers are available.
     -----+---------------------------------------------------------+---------------------------------+
 
   The general pattern is that for an n-bit integer, signed integers have the range [-2**(n-1),
-  2**(n-1) - 1] and signed [0, 2**n - 1].
+  2**(n-1) - 1] and unsigned integers have the range [0, 2**n - 1].
 
   3.4. Using pif_LongInt integers
   ------------------------------------------
@@ -131,13 +130,167 @@ integers are available.
   3.4.1. pif_LongInt operators
   -------------------------------------
 
+  The overloaded operators in pif_LongInt operate generally how one would expect with the floating
+  point numbers native to DM, with a few caveats. For example, these numbers will work correctly with
+  BYOND's built in numbers, but only if they're integers. If they're non-integers, then the operation
+  will fail:
 
-/****************************************************************************************************/
+      U += 50  // Adds 50 to U.
+      U += 2.5 // Throws an exception, as 2.5 is not an integer and so the result is not an integer.
+
+  pif_LongInt objects will also accept several other types of operands in addition to integers. For a
+  full list, please refer to "pif_Arithmetic Protocol.dm" for more information on the General
+  Arithmetic Argument Formats (GAAF). For the average user, the two most important types of operands/
+  arguments for these operators are:
+
+    (1) Integers. These can be any integers, but to assure accuracy one should make sure they are
+        between -16,777,216 and 16,777,216 inclusive.
+
+            S *= 50
+            U = S - 16000000
+
+    (2) Strings. Though there are a number of string formats accepted, the one that is of most use to
+        the general programmer is a decimal string. That is, a string consisting only of the numbers
+        0 through 9, with an optional negative sign at the front.
+
+            S *= "-123"
+            U = (S - "-100") * "50"
+
+  It is important to note that pif_LongInt distinguishes the behavior of assignment operators with
+  the behavior of non-assignment operators (with two exceptions). Assignment operators will directly
+  change the value of the left hand-side argument, while non-assignment operators will generate an
+  entirely new object:
+
+      var/pif_LongInt/Unsigned32/Int = new(500)
+
+      world << Int.Print()        // "500"
+      Int += 100
+      world << Int.Print()        // "600"
+
+      world << (Int + 50).Print() // "650"
+      world << Int.Print()        // "600"
+
+  Refer to the table below for complete details about the operators.
+
+                            ARITHMETIC OPERATORS
+
+    Name                  | Operator | Modifying | Behavior
+    ----------------------+----------+-----------+---------------------------------------------------
+    Addition              |    +     |    No     | Adds the operands together, producing a new object
+    ----------------------+----------+-----------+---------------------------------------------------
+    Addition (assignment) |    +=    |   Yes     | Adds the operand on the right to the left, storing
+                          |          |           | the value on the operand on the left.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Subtraction           |    -     |    No     | Subtracts the operand on the right from the
+                          |          |           | operand on the left, producing a new object.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Subtraction           |          |           | Subtracts the operand on the right from the
+       (assignment)       |    -=    |   Yes     | operand on the left, storing the value on the
+                          |          |           | operand on the left.
+    ----------------------+----------+-----------+---------------------------------------------------
+                          |          |           | Computes the negative of the operand. Returning a
+    Negation              |    -     |    No     | new object with that value. For unsigned integers,
+                          |          |           | this will be a copy of the original object.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Multiplication        |    *     |    No     | Multiplies the operands, producing a new object.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Multiplication        |    *=    |   Yes     | Multiplies the operands, storing the value on the
+       (assignment)       |          |           | operand on the left.
+    ----------------------+----------+-----------+---------------------------------------------------
+                          |          |           | Divides the operand on the left by the operand on
+    Integer Division      |    /     |    No     | the right, producing a new object. Note that this
+                          |          |           | is integer division,  which is equivalent to
+                          |          |           | rounding down the final result.
+    ----------------------+----------+-----------+---------------------------------------------------
+                          |          |           | Divides the operand on hte left by the operand on
+    Inteder Division      |    /=    |   Yes     | the right, storing the value on the operand on the
+       (assignment)       |          |           | left. Note that this is integer division, which is
+                          |          |           | equivalent to rounding down the final result.
+    ----------------------+----------+-----------+---------------------------------------------------
+                          |          |           | Computes the remainder of division when dividing
+    Modulus               |    %     |    No     | the operand on the left by the operand on the
+                          |          |           | right, producing a new object.
+    ----------------------+----------+-----------+---------------------------------------------------
+                          |          |           | Computes the remainder of division when dividing
+    Modulus               |    %=    |   Yes     | the operand on the left by the operand on the
+       (assignment)       |          |           | right, then stores the result on the operand on
+                          |          |           | left.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Increment             |    ++    |   Yes     | Adds one to the operand, storing the new value in
+                          |          |           | the operand.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Decrement             |    --    |   Yes     | Subtracts one from the operand, storing the new
+                          |          |           | value in the operand.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Exponentiation        |    **    |   No      | Takes the operand on the left to the power of the
+                          |          |           | operand on the right, producing a new object.
+    ----------------------+----------+-----------+---------------------------------------------------
+
+                              BITWISE OPERATORS
+
+    Name                  | Operator | Modifying | Behavior
+    ----------------------+----------+-----------+---------------------------------------------------
+    Bitwise Not           |    ~     |    No     | Computes the bitwise not of the operand, producing
+                          |          |           | a new object.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Bitwise And           |    &     |    No     | Computes the bitwise and of the operands,
+                          |          |           | producing a new object.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Bitwise And           |    &=    |   Yes     | Computes the bitwise and of the operands, storing
+       (assignment)       |          |           | the result on the left operand.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Bitwise Or            |    |     |    No     | Computes the bitwise or of the operands, producing
+                          |          |           | a new object.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Bitwise Or            |    |=    |   Yes     | Computes the bitwise or of the operands, storing
+       (assignment)       |          |           | the result on the left operand.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Bitwise Xor           |    ^     |    No     | Computes the bitwise xor of the operands,
+                          |          |           | producing a new object.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Bitwise Xor           |    ^=    |   Yes     | Computes the bitwise xor of the operands, storing
+       (assignment)       |          |           | the result on the left operand.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Bitshift Left         |   <<     |    No     | Computes the bitshift left of the operands,
+                          |          |           | producing a new object.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Bitshift Left         |   <<=    |   Yes     | Computes the bitshift left of the operands,
+       (assignment)       |          |           | storing the result in the left operand.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Bitshift Right        |   >>     |    No     | Computes the bitshift right of the operands,
+                          |          |           | producing a new object.
+    ----------------------+----------+-----------+---------------------------------------------------
+    Bitshift Right        |   >>=    |   Yes     | Computes the bitshift right of the operands,
+       (assignment)       |          |           | storing the result in the left operand.
+    ----------------------+----------+-----------+---------------------------------------------------
+
+                           COMPARISON OPERATORS
+
+    Name                  | Operator | Behavior
+    ----------------------+----------+---------------------------------------------------------------
+    Equivalent            |    ~=    | Returns true if the left and right hand sides have the same
+                          |          | value, and false otherwise.
+    ----------------------+----------+---------------------------------------------------------------
+    Not Equivalent        |    ~!    | Returns false if the left and right hand sides have the same
+                          |          | value, and false otherwise.
+    ----------------------+----------+---------------------------------------------------------------
+    Greater Than          |    >     | Returns true if the left hand side is greater than the right
+                          |          | hand side, and false otherwise.
+    ----------------------+----------+---------------------------------------------------------------
+    Greater Than Or Equal |    >=    | Returns true if the left hand side is greater than or is equal
+       To                 |          | to the right hand side, and false otherwise.
+    ----------------------+----------+---------------------------------------------------------------
+    Less Than             |    <     | Returns true if the left hand side is less than the right hand
+                          |          | side, and false otherwise.
+    ----------------------+----------+---------------------------------------------------------------
+    Less Than Or Equal To |    <=    | Returns true if hte left hand side is less than or is equal to
+                          |          | the right hand side, and false otherwise.
+    ----------------------+----------+---------------------------------------------------------------/
 
   4. Release Notes
   ----------------------------------------------------
 
-  Version b1.1.2.201712?? [unreleased]
+  Version b1.1.2.20171217
 
     - The library now supports the newly-implemented overloaded operators feature. This means that
       the integer classes can be used much more like BYOND's built in numeric types, without having
@@ -175,7 +328,6 @@ integers are available.
     - Fixed an bug with the Signed32 class that would result in it throwing an overflow
       exception in the cases when UnsignedDouble would have an overflow, even though the situations
       where signed and unsigned doubles overflow are very different.
-
 
   Version b1.1.20160502.
 
