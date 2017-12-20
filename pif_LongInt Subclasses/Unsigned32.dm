@@ -67,7 +67,7 @@ LongInt/Unsigned32
 				Data[1] = 0
 				Data[2] = 0
 
-			if(arguments.len == 1)
+			else if(arguments.len == 1)
 
 
 				if(isnull(arguments[1]))

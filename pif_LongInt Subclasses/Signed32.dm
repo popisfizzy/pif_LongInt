@@ -69,7 +69,7 @@ LongInt/Signed32
 				Data[1] = 0
 				Data[2] = 0
 
-			if(arguments.len == 1)
+			else if(arguments.len == 1)
 
 
 				if(isnull(arguments[1]))
@@ -3037,12 +3037,32 @@ though the downside that remainders may be negative.
 		else
 			Int = src
 
-		if(n >= BitLength())
-			Int.block_1 = 0
-			Int.block_2 = 0
+		if(IsNegative())
+			// If a signed integer is negative, then right-shifting it will preserve
+			// the sign.
+
+			if(n >= BitLength())
+				Int.block_1 = 0xFFFF
+				Int.block_2 = 0xFFFF
+
+			else if(n <= 16)
+				hold = Int.block_2 << (16 - n)
+
+				Int.block_1 = ((Int.block_1 >> n) | hold) & 0xFFFF
+				Int.block_2 = ((Int.block_2 >> n) & 0xFFFF) | (0xFFFF << (16 - n))
+
+			else
+				Int.block_1 = ((Int.block_2 >> (n-16)) & 0xFFFF) | (0xFFFF << (32 - n))
+				Int.block_2 = 0xFFFF
 
 		else
-			if(n <= 16)
+			// If it's non-negative, then we proceed as with an unsigned integer.
+
+			if(n >= BitLength())
+				Int.block_1 = 0
+				Int.block_2 = 0
+
+			else if(n <= 16)
 				hold = Int.block_2 << (16 - n)
 
 				Int.block_1 = ((Int.block_1 >> n) | hold) & 0xFFFF
@@ -3595,55 +3615,77 @@ though the downside that remainders may be negative.
 		return src
 
 	proc/operator-(...)
-		var
-			list/Processed = _ProcessArguments(args)
 
-			Int_block_1 = Processed[1]
-			Int_block_2 = Processed[2]
+		if(length(args) == 0)
+			// If there are no arguments, then it's negation.
 
 #if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
-			pif_LongInt/Signed32/Diff = new src.type(src)
+			var/pif_LongInt/Signed32/Int = new src.type(src)
 #else
-			LongInt/Signed32/Diff = new src.type(src)
+			var/LongInt/Signed32/Int = new src.type(src)
+#endif
+			Int.SetModeFlag(NEW_OBJECT, 0)
+
+			Int.block_1 = ~block_1
+			Int.block_2 = ~block_2
+			Int.Increment()
+
+			Int.SetModeFlag(NEW_OBJECT, 1)
+
+			return Int
+
+		else
+			// Otherwise, it's subtraction.
+
+			var
+				list/Processed = _ProcessArguments(args)
+
+				Int_block_1 = Processed[1]
+				Int_block_2 = Processed[2]
+
+#if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_LONGINT)
+				pif_LongInt/Signed32/Diff = new src.type(src)
+#else
+				LongInt/Signed32/Diff = new src.type(src)
 #endif
 
-			overflow_mode = mode & OVERFLOW_EXCEPTION
-			result_sign
+				overflow_mode = mode & OVERFLOW_EXCEPTION
+				result_sign
 
-		if(overflow_mode)
-			result_sign = (IsNegative() ? -1 : 1) - ((Int_block_2 & 0x8000) ? -1 : 1)
+			if(overflow_mode)
+				result_sign = (IsNegative() ? -1 : 1) - ((Int_block_2 & 0x8000) ? -1 : 1)
 
-		var
-			B1 = 0
-			B2 = 0
+			var
+				B1 = 0
+				B2 = 0
 
-		B1 = pliBYTE_ONE(block_1) + pliBYTE_ONE_N(Int_block_1) + 1
-		B2 = pliBYTE_TWO(block_1) + pliBYTE_TWO_N(Int_block_1) + pliBUFFER(B1)
+			B1 = pliBYTE_ONE(block_1) + pliBYTE_ONE_N(Int_block_1) + 1
+			B2 = pliBYTE_TWO(block_1) + pliBYTE_TWO_N(Int_block_1) + pliBUFFER(B1)
 
-		Diff._SetBlock(1, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
+			Diff._SetBlock(1, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
-		B1 = pliBYTE_ONE(block_2) + pliBYTE_ONE_N(Int_block_2) + pliBUFFER(B2)
-		B2 = pliBYTE_TWO(block_2) + pliBYTE_TWO_N(Int_block_2) + pliBUFFER(B1)
+			B1 = pliBYTE_ONE(block_2) + pliBYTE_ONE_N(Int_block_2) + pliBUFFER(B2)
+			B2 = pliBYTE_TWO(block_2) + pliBYTE_TWO_N(Int_block_2) + pliBUFFER(B1)
 
-		Diff._SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
+			Diff._SetBlock(2, pliBYTE_ONE(B1) | pliBYTE_ONE_SHIFTED(B2))
 
-		if(overflow_mode && (result_sign != 0))
+			if(overflow_mode && (result_sign != 0))
 
-			if(Diff.IsNegative() && (result_sign > 0))
+				if(Diff.IsNegative() && (result_sign > 0))
 #if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
-				throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+					throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
 #else
-				throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+					throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
 #endif
 
-			else if(Diff.IsNonNegative() && (result_sign < 0))
+				else if(Diff.IsNonNegative() && (result_sign < 0))
 #if	!defined(PIF_NOPREFIX_GENERAL) && !defined(PIF_NOPREFIX_ARITHMETIC)
-				throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
+					throw new /pif_Arithmetic/OverflowException(__FILE__, __LINE__)
 #else
-				throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
+					throw new /Arithmetic/OverflowException(__FILE__, __LINE__)
 #endif
 
-		return Diff
+			return Diff
 
 	proc/operator-=(...)
 		var
@@ -4849,12 +4891,27 @@ though the downside that remainders may be negative.
 			var/LongInt/Unsigned32/Int = new src.type(src)
 #endif
 
-		if(n >= BitLength())
-			Int.block_1 = 0
-			Int.block_2 = 0
+		if(IsNegative())
+			if(n >= BitLength())
+				Int.block_1 = 0xFFFF
+				Int.block_2 = 0xFFFF
+
+			else if(n <= 16)
+				hold = Int.block_2 << (16 - n)
+
+				Int.block_1 = ((Int.block_1 >> n) | hold) & 0xFFFF
+				Int.block_2 = ((Int.block_2 >> n) & 0xFFFF) | (0xFFFF << (16 - n))
+
+			else
+				Int.block_1 = ((Int.block_2 >> (n-16)) & 0xFFFF) | (0xFFFF << (32 - n))
+				Int.block_2 = 0xFFFF
 
 		else
-			if(n <= 16)
+			if(n >= BitLength())
+				Int.block_1 = 0
+				Int.block_2 = 0
+
+			else if(n <= 16)
 				hold = Int.block_2 << (16 - n)
 
 				Int.block_1 = ((Int.block_1 >> n) | hold) & 0xFFFF
@@ -4883,12 +4940,27 @@ though the downside that remainders may be negative.
 		var
 			hold
 
-		if(n >= BitLength())
-			block_1 = 0
-			block_2 = 0
+		if(IsNegative())
+			if(n >= BitLength())
+				block_1 = 0xFFFF
+				block_2 = 0xFFFF
+
+			else if(n <= 16)
+				hold = block_2 << (16 - n)
+
+				block_1 = ((block_1 >> n) | hold) & 0xFFFF
+				block_2 = ((block_2 >> n) & 0xFFFF) | (0xFFFF << (16 - n))
+
+			else
+				block_1 = ((block_2 >> (n-16)) & 0xFFFF) | (0xFFFF << (32 - n))
+				block_2 = 0xFFFF
 
 		else
-			if(n <= 16)
+			if(n >= BitLength())
+				block_1 = 0
+				block_2 = 0
+
+			else if(n <= 16)
 				hold = block_2 << (16 - n)
 
 				block_1 = ((block_1 >> n) | hold) & 0xFFFF
@@ -4897,6 +4969,8 @@ though the downside that remainders may be negative.
 			else
 				block_1 = (block_2 >> (n-16)) & 0xFFFF
 				block_2 = 0
+
+		return src
 
 		return src
 

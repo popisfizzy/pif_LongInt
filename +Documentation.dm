@@ -1,7 +1,7 @@
 /**
  ** pif_LongInt
- **   Version: b1.1.2.20171217
- **   Release Date: December 17, 2017
+ **   Version: b1.1.3.201712?? [unreleased]
+ **   Release Date: December ??, 2017
  **
  ***************************************************************************************************
  ***************************************************************************************************
@@ -289,6 +289,18 @@ integers are available.
 
   4. Release Notes
   ----------------------------------------------------
+
+  Version b1.1.3.201712?? [unreleased]
+
+    - Fixed a bug that would result in empty arguments (except in constructors) would result in a
+      runtime error.
+    - Fixed a bug in the operator-() method on the Signed32 class that would fail to return the
+      proper result when doing negation (that is, when the operator-() method had no arguments).
+    - Changed the behavior of right bitshifting methods (BitshiftRight(), operator>>(), and
+      operator>>=()) on the Signed32 class. Previously, the most significant bits were filled with
+      0's, while common behavior is to fill them with 1's if the number is negative so as to keep
+      right bitshifts the same as integer division by two. The BitshiftRightRotate() method is not
+      affected by this change.
 
   Version b1.1.2.20171217
 
