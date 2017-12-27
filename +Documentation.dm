@@ -305,6 +305,8 @@ integers are available.
       both Signed32 and Unsigned32.
     - A minor note about the version number: Based on my numbering scheme, the last update should
       probably have been b1.2.1.20171217, so I'm skipping over this version number and jumping to
+      the correct order. To be honest, b1.1.0.20170724 should probably have been b1.2.0.20170724
+      too, but oh well...
 
   Version b1.1.2.20171217
 
