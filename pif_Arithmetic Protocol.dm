@@ -10,8 +10,8 @@
 
 /**
  ** pif_Arithmetic
- **   Version: b1.1.20160502
- **   Release Date: May 5, 2016
+ **   Version: b1.2.2.20171227
+ **   Release Date: December 27, 2017
  **
  ***************************************************************************************************
  ***************************************************************************************************
@@ -33,6 +33,11 @@
 
   2. Release Notes
   ----------------------------------------------------
+
+  Version b1.2.2.20171227
+
+    - Updated the specification on the FindFirstSet() and FindLastSet() methods.
+    - Added CountLeadingZeros() and CountTrailingZeros() methods.
 
   Version b1.1.20160502.
 
@@ -895,7 +900,8 @@ would be of more use than the /pif_Arithmetic/InvalidArgumentFormatException exc
 
 			    Outputs the position of least-significant non-zero bit. That is, the position of the
                 first bit from the right which is not equal to zero. The least-significant bit is
-                considered in position zero.
+                considered in position one. If no bits are enabled (i.e., the object is equal to
+                zero), then output zero.
 
 			  Returns.
 
@@ -914,13 +920,58 @@ would be of more use than the /pif_Arithmetic/InvalidArgumentFormatException exc
 
 			  Behavior.
 
-			    Outputs the position of the most-significant non-zero bit. Taht is, the position of
+			    Outputs the position of the most-significant non-zero bit. That is, the position of
 			    the first bit from the left which is not equal to zero. The least-significant bit is
-			    considered to be in position zero.
+			    considered to be in position one. If no bits are enabled (i.e., the object is equal
+			    to zero), then output zero.
 
 			  Returns.
 
 			    A non-negative integer.
+
+			*/
+
+		CountLeadingZeros()
+			/*
+
+			Outputs the number of zeros before the most-significant non-zero bit.
+
+			Arguments.
+
+			  None.
+
+			Behavior.
+
+			  Outputs the number of zeros before the most-significant non-zero bit. That is, the
+			  number of zeros to the left of the largest non-zero bit. This will be equal to
+			  BitLength() - FindLastSet(). If no bits are enabled (i.e., the object is equal to
+			  zero), output BitLength().
+
+			Returns.
+
+			  A non-negative integer.
+
+			*/
+
+		CountTrailingZeros()
+			/*
+
+			Outputs the number of zeros after the least-significant non-zero bit.
+
+			Arguments.
+
+			  None.
+
+			Behavior.
+
+			  Outputs the number of zeros after the most-significant non-zero bit. That is, the
+			  number of zeros to the right of the smallest non-zero bit. This will be equal to
+			  FirstFirstSet() - 1. If no bits are enabled (i.e., the object is equal to
+			  zero), output BitLength().
+
+			Returns.
+
+			  A non-negative integer.
 
 			*/
 

@@ -2720,9 +2720,164 @@ LongInt/Unsigned32
 	// Miscellaneous methods.
 
 	FindFirstSet()
-		// TODO
+		// Check block_1 first, as it's least-significant.
+		if(block_1 &     1) return  1
+		if(block_1 &     2) return  2
+		if(block_1 &     4) return  3
+		if(block_1 &     8) return  4
+		if(block_1 &    16) return  5
+		if(block_1 &    32) return  6
+		if(block_1 &    64) return  7
+		if(block_1 &   128) return  8
+		if(block_1 &   256) return  9
+		if(block_1 &   512) return 10
+		if(block_1 &  1024) return 11
+		if(block_1 &  2048) return 12
+		if(block_1 &  4096) return 13
+		if(block_1 &  8192) return 14
+		if(block_1 & 16384) return 15
+		if(block_1 & 32768) return 16
+
+		// And then block_2, as it's more-significant.
+		if(block_2 &     1) return 17
+		if(block_2 &     2) return 18
+		if(block_2 &     4) return 19
+		if(block_2 &     8) return 20
+		if(block_2 &    16) return 21
+		if(block_2 &    32) return 22
+		if(block_2 &    64) return 23
+		if(block_2 &   128) return 24
+		if(block_2 &   256) return 25
+		if(block_2 &   512) return 26
+		if(block_2 &  1024) return 27
+		if(block_2 &  2048) return 28
+		if(block_2 &  4096) return 29
+		if(block_2 &  8192) return 30
+		if(block_2 & 16384) return 31
+		if(block_2 & 32768) return 32
+
+		// No bits on, i.e. src ~= 0.
+		return 0
+
 	FindLastSet()
-		// TODO
+		// Check block_2 first, because it's more significant.
+		if(block_2 & 32768) return 32
+		if(block_2 & 16384) return 31
+		if(block_2 &  8192) return 30
+		if(block_2 &  4096) return 29
+		if(block_2 &  2048) return 28
+		if(block_2 &  1024) return 27
+		if(block_2 &   512) return 26
+		if(block_2 &   256) return 25
+		if(block_2 &   128) return 24
+		if(block_2 &    64) return 23
+		if(block_2 &    32) return 22
+		if(block_2 &    16) return 21
+		if(block_2 &     8) return 20
+		if(block_2 &     4) return 19
+		if(block_2 &     1) return 18
+		if(block_2 &     2) return 17
+
+		// And then block_1.
+		if(block_1 & 32768) return 16
+		if(block_1 & 16384) return 15
+		if(block_1 &  8192) return 14
+		if(block_1 &  4096) return 13
+		if(block_1 &  2048) return 12
+		if(block_1 &  1024) return 11
+		if(block_1 &   512) return 10
+		if(block_1 &   256) return  9
+		if(block_1 &   128) return  8
+		if(block_1 &    64) return  7
+		if(block_1 &    32) return  6
+		if(block_1 &    16) return  5
+		if(block_1 &     8) return  4
+		if(block_1 &     4) return  3
+		if(block_1 &     2) return  2
+		if(block_1 &     1) return  1
+
+		// No bits on, i.e. src ~= 0.
+		return 0
+
+	CountTrailingZeros()
+		// Check block_1 first, as it's least-significant.
+		if(block_1 &     1) return  0
+		if(block_1 &     2) return  1
+		if(block_1 &     4) return  2
+		if(block_1 &     8) return  3
+		if(block_1 &    16) return  4
+		if(block_1 &    32) return  5
+		if(block_1 &    64) return  6
+		if(block_1 &   128) return  7
+		if(block_1 &   256) return  8
+		if(block_1 &   512) return  9
+		if(block_1 &  1024) return 10
+		if(block_1 &  2048) return 11
+		if(block_1 &  4096) return 12
+		if(block_1 &  8192) return 13
+		if(block_1 & 16384) return 14
+		if(block_1 & 32768) return 15
+
+		// And then block_2, as it's more-significant.
+		if(block_2 &     1) return 16
+		if(block_2 &     2) return 17
+		if(block_2 &     4) return 18
+		if(block_2 &     8) return 19
+		if(block_2 &    16) return 20
+		if(block_2 &    32) return 21
+		if(block_2 &    64) return 22
+		if(block_2 &   128) return 23
+		if(block_2 &   256) return 24
+		if(block_2 &   512) return 25
+		if(block_2 &  1024) return 26
+		if(block_2 &  2048) return 27
+		if(block_2 &  4096) return 28
+		if(block_2 &  8192) return 29
+		if(block_2 & 16384) return 30
+		if(block_2 & 32768) return 31
+
+		// No bits on, i.e. src ~= 0.
+		return 32
+
+	CountLeadingZeros()
+		// Check block_2 first, because it's more significant.
+		if(block_2 & 32768) return  0
+		if(block_2 & 16384) return  1
+		if(block_2 &  8192) return  2
+		if(block_2 &  4096) return  3
+		if(block_2 &  2048) return  4
+		if(block_2 &  1024) return  5
+		if(block_2 &   512) return  6
+		if(block_2 &   256) return  7
+		if(block_2 &   128) return  8
+		if(block_2 &    64) return  9
+		if(block_2 &    32) return 10
+		if(block_2 &    16) return 11
+		if(block_2 &     8) return 12
+		if(block_2 &     4) return 13
+		if(block_2 &     1) return 14
+		if(block_2 &     2) return 15
+
+		// And then block_1.
+		if(block_1 & 32768) return 16
+		if(block_1 & 16384) return 17
+		if(block_1 &  8192) return 18
+		if(block_1 &  4096) return 19
+		if(block_1 &  2048) return 20
+		if(block_1 &  1024) return 21
+		if(block_1 &   512) return 22
+		if(block_1 &   256) return 23
+		if(block_1 &   128) return 24
+		if(block_1 &    64) return 25
+		if(block_1 &    32) return 26
+		if(block_1 &    16) return 27
+		if(block_1 &     8) return 28
+		if(block_1 &     4) return 29
+		if(block_1 &     2) return 30
+		if(block_1 &     1) return 31
+
+		// No bits on, i.e. src ~= 0.
+		return 32
 
 	/*
 	 * Comparison methods.

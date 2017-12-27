@@ -1,7 +1,7 @@
 /**
  ** pif_LongInt
- **   Version: b1.1.3.201712?? [unreleased]
- **   Release Date: December ??, 2017
+ **   Version: b1.2.2.20171227
+ **   Release Date: December 27, 2017
  **
  ***************************************************************************************************
  ***************************************************************************************************
@@ -290,7 +290,7 @@ integers are available.
   4. Release Notes
   ----------------------------------------------------
 
-  Version b1.1.3.201712?? [unreleased]
+  Version b1.2.2.20171227
 
     - Fixed a bug that would result in empty arguments (except in constructors) would result in a
       runtime error.
@@ -301,6 +301,10 @@ integers are available.
       0's, while common behavior is to fill them with 1's if the number is negative so as to keep
       right bitshifts the same as integer division by two. The BitshiftRightRotate() method is not
       affected by this change.
+    - Implemented FindFirstSet(), FindLastSet(), CountLeadingZeros(), and CountTrailingZeros() on
+      both Signed32 and Unsigned32.
+    - A minor note about the version number: Based on my numbering scheme, the last update should
+      probably have been b1.2.1.20171217, so I'm skipping over this version number and jumping to
 
   Version b1.1.2.20171217
 
