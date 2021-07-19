@@ -5140,5 +5140,26 @@ though the downside that remainders may be negative.
 	proc/operator<(...)
 		return Compare(arglist(args)) == -1
 	proc/operator<=(...)
+		return Compare(arglist(args)) !=  1
+
+#endif
+
+#if	(DM_VERSION < 514)
+#warn BYOND v514 or newer required to use the := operator
+#else
+
+/*
+ * This implements the := operator, which is more recent than the other operators. It allows datums
+ * to be used more "transparently", without having to overtly call a method to change the value
+ * stored in the object.
+ */
+
+	proc/operator:=(...)
+		var/list/Processed = _ProcessArguments(args)
+
+		block_1 = Processed[1]
+		block_2 = Processed[2]
+
+		return src
 
 #endif

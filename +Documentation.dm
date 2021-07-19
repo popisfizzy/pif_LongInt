@@ -1,7 +1,7 @@
 /**
  ** pif_LongInt
- **   Version: b1.2.2.20171227
- **   Release Date: December 27, 2017
+ **   Version: b1.2.3.20210718
+ **   Release Date: July 18, 2021
  **
  ***************************************************************************************************
  ***************************************************************************************************
@@ -106,7 +106,7 @@ integers are available.
 
   Thanks to the introduction of operator overloading in BYOND v512, you can now use pif_LongInt
   objects in a largely-"transparent" way. That is, you can use the built-in operators without much
-  concern for the fact that these are objects. There are three exceptions to this:
+  concern for the fact that these are objects. There are two exceptions to this:
 
     (1) As these are objects, they must be created and initialized.
 
@@ -114,16 +114,7 @@ integers are available.
                 Unsigned32/U = new(50) // U is created with a value of 50.
                 Signed32/S   = new(-5) // S is created with a value of -5.
 
-    (2) Assigning a new value to an existing pif_LongInt object must be done using the Set() method,
-        rather than the assignment operation.
-
-            U.Set(500) // 500 is now stored in U.
-            S.Set(28)  // 28 is now stored in S.
-
-        Using the assignment operator will result in that value being stored in the variable, rather
-        than in the object.
-
-    (3) To display the value of the object, one must use the Print() method.
+    (2) To display the value of the object, one must use the Print() method.
 
             world << (U*S).Print() // This will output "14000".
 
@@ -285,10 +276,29 @@ integers are available.
     ----------------------+----------+---------------------------------------------------------------
     Less Than Or Equal To |    <=    | Returns true if hte left hand side is less than or is equal to
                           |          | the right hand side, and false otherwise.
-    ----------------------+----------+---------------------------------------------------------------/
+    ----------------------+----------+---------------------------------------------------------------
+
+                           ASSIGNMENT OPERATORS
+
+    Name                  | Operator | Behavior
+    ----------------------+----------+---------------------------------------------------------------
+    Assignment            |    :=    | Assigns the value on the right hand side of the operator to
+                          |          | the LongInt object. This will accept any value that is in one
+                          |          | of the General Arithmetic Argument Formats found in
+                          |          | 'pif_Arithmetic protocol.dm'
+    ----------------------+----------+---------------------------------------------------------------
 
   4. Release Notes
   ----------------------------------------------------
+
+  Version b1.2.3.20210718
+
+    - Due to a typo and a missing return value for an overloaded operator, comparison operators would
+      sometimes report incorrect results. (Multiverse7)
+    - Implemented the := operator, introduced in v514. This allows the library to be used more
+      transparently, because now a method does not need to be (explicitly) used to assign data into
+      a LongInt object.
+    - Updated the documentation to address the := operator.
 
   Version b1.2.2.20171227
 
@@ -374,7 +384,7 @@ integers are available.
   ----------------------------------------------------
 
   - Write up complete documentation for the library.
-  - Implement classes for both signed and unsigned 48-bit and 64-bit integers..
+  - Implement classes for both signed and unsigned 48-bit and 64-bit integers.
   - Set up a preprocessor flag that toggles allowing negative remainders or having only positive
     remainders. Currently, negative remainders are allowed to appear.
   - Set up a flag that disables overflow/underflow checking entirely, avoiding the processor cycles
